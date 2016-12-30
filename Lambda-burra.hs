@@ -26,6 +26,9 @@ mallet = [card1,card25,card39,card17,card22,card16,card37,card28,card4,card30,ca
 		card17,card8,card29,card10,card8,card23,card33,card34,card35,card12,card7,card18,card30,
 		card20,card11,card24,card26,card36,card14,card31,card19,card15,card5]
 
+table :: Mallet
+table = [card18]
+
 ------------------------------------- Definicion de Cartas ----------------------------------
 card1 = Card As Oro
 card2 = Card (Numeric 2) Oro
@@ -90,27 +93,10 @@ empty :: Hand
 empty = (H [])
 
 
-showSuit :: Card -> String								
-showSuit (Card _ s)
-	| s == Oro = "O"
-	| s == Copas = "C"
-	| s == Espadas = "E"
-	| s == Bastos = "B" 
-
-
-showValue :: Card -> String									
-showValue (Card v _)
-	| v == As = "A"
-	| v == Sota = "10"
-	| v == Caballo = "11"
-	| v == Rey = "12"
-	| v == (Numeric 2) = show 2
-	| v == (Numeric 3) = show 3
-	| v == (Numeric 4) = show 4
-	| v == (Numeric 5) = show 5
-	| v == (Numeric 6) = show 6
-	| v == (Numeric 7) = show 7
 ----------------------------------------- Lambda Juega Segundo ---------------------------------
+
+
+
 ------------------------ Busca una pinta en una mano ------------------------
 searchSuitHand :: Hand -> Suit -> Bool
 searchSuitHand (H []) s = False
@@ -154,18 +140,80 @@ letterSuit (H card) (Card v su) = [x|x<-card, checkSuit x su]
 letterToPlay :: Hand -> Card -> Card
 letterToPlay h c = if  killLetters h c /= [] then lowerLetter $ killLetters h c else lowerLetter $ letterSuit h c
 
+
+
 ------------------------------- Lambda Juega Primero ------------------------------------------------
+
+
 
 ------------------------------- Devuelve la carta mayor de la mano ----------------------------------
 greaterLetter :: Hand -> Card
 greaterLetter (H [x]) = x
-greaterLetter (H (x:y:xs)) = if x > y then greaterLetter (H(x:xs)) else greaterLetter (H(y:xs))
+greaterLetter (H (x:y:xs)) = if x > y then greaterLetter (H (x:xs)) else greaterLetter (H (y:xs))
 
 
+-------------------------------- Coloca una carta en la mesa -----------------------------------
+addLetterToTable :: Card -> Mallet -> Mallet
+addLetterToTable c m = c:m
+
+---------------------------------- Devuelve la carta que gana la ronda --------------------------------
+winRound :: Mallet -> Card
+winRound m = max (head m) $ head $ tail m
+
+
+
+
+------------------------------- Jugador --------------------------------
+
+
+-------------------------------- Busca una carta en la mano ---------------------------------------
+searchLetter :: Hand -> Card -> Card
+searchLetter (H []) _ = (Card (Numeric 0) Oro)
+searchLetter (H (x:xs)) c = if x == c then x else searchLetter (H xs) c
+
+
+---------------------------------- Muestra la Pinta de una carta ---------------------------
+showSuit :: Card -> String								
+showSuit (Card _ s)
+	| s == Oro = "Oro"
+	| s == Copas = "Copas"
+	| s == Espadas = "Espadas"
+	| s == Bastos = "Bastos" 
+
+--------------------------------- Muestra el valor de una carta --------------------------------
+showValue :: Card -> String									
+showValue (Card v _)
+	| v == As = "1"
+	| v == Sota = "10"
+	| v == Caballo = "11"
+	| v == Rey = "12"
+	| v == (Numeric 2) = show 2
+	| v == (Numeric 3) = show 3
+	| v == (Numeric 4) = show 4
+	| v == (Numeric 5) = show 5
+	| v == (Numeric 6) = show 6
+	| v == (Numeric 7) = show 7
+
+------------------------------- Muestra una carta ----------------------------------
+showLetter :: Card -> String
+showLetter c = showValue c ++ " " ++ showSuit c
+
+
+---------------------------- Muestra una mano -----------------------------------
+showHand :: Hand -> String
+showHand (H []) = ""
+showHand (H c) = showLetter (head c) ++ ", " ++ showHand (H (tail c))
+
+
+--------------------------------- Main -----------------------------------------
 main = do 
 	gen <- getStdGen
 	putStrLn "Bienvenido al juego carga la burra."
-	
+
+{-	Prueba de las funciones.
+	addLetterToTable (letterToPlay hand1 $ head table) table
+	winRound $ addLetterToTable (letterToPlay hand1 $ head table) table
+-}
 
 {-mazoaleatorio :: StdGen -> [Int]
 mazoaleatorio gen = [x|x<-a, not (x `elem` )]
