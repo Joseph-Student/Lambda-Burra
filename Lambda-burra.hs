@@ -2,6 +2,7 @@ import Test.QuickCheck
 import Data.Char							
 import Data.List
 import System.Random
+
 ------------------------- Creacion de tipos de datos ---------------------------------------
 data Value = Numeric Int | Sota | Caballo | Rey | As 
 						deriving (Eq, Show, Ord);
@@ -107,17 +108,30 @@ loadUpMallet :: Mallet -> Suit -> Mallet
 loadUpMallet [] _ = []
 loadUpMallet (Card v su:xs) s = if s /= su then [Card v su]++loadUpMallet xs s else [Card v su]
 
+------------------------------------- Carga las cartas que estan en la mesa ------------------------------
+loadUpTable :: Mallet -> Mallet -> Mallet
+loadUpTable m t = if c == [] then t else c
+	where c = loadUpMallet m s
+	      s = getSuit card
+	      card = head t
+
+-------------------------------- Obtiene la pinta de una carta --------------------------------------------
+getSuit :: Card -> Suit
+getSuit (Card _ s) = s
+
 --------------------------------- Une las cartas cargadas a la mano -----------------------------------
 joinHand :: Mallet -> Hand -> Hand
 joinHand x (H cards) = (H (cards ++ x))
 
 ------------------------ Devuelve una mano con cartas de la pinta que esta en la mesa ---------------------
-turnLambda :: Mallet -> Hand -> Card -> Hand
-turnLambda m h (Card _ s) = if searchSuitHand h s == False then joinHand (loadUpMallet m s) h else h
+turnLambda :: Mallet -> Hand -> Mallet -> Hand
+turnLambda m h t = if s == False then joinHand (loadUpTable m t) h else h
+	where s = searchSuitHand h suit
+	      suit = getSuit $ head t
 
 --------------------------- Verifica si una carta es de una pinta -------------------------------------
 checkSuit :: Card -> Suit -> Bool
-checkSuit (Card _ s) su = if s == su then True else False
+checkSuit c su = if getSuit c == su then True else False
 
 ---------------------------- Verifica si una carta es mayor que otra -------------------------------------
 checkValue :: Card -> Value -> Bool
@@ -202,6 +216,7 @@ showLetter c = showValue c ++ " " ++ showSuit c
 ---------------------------- Muestra una mano -----------------------------------
 showHand :: Hand -> String
 showHand (H []) = ""
+showHand (H (x:[])) = showLetter x
 showHand (H c) = showLetter (head c) ++ ", " ++ showHand (H (tail c))
 
 
