@@ -28,7 +28,7 @@ mallet = [card1,card25,card39,card17,card22,card16,card37,card28,card4,card30,ca
 		card20,card11,card24,card26,card36,card14,card31,card19,card15,card5]
 
 table :: Mallet
-table = [card18]
+table = [card12]
 
 ------------------------------------- Definicion de Cartas ----------------------------------
 card1 = Card As Oro
@@ -86,8 +86,8 @@ hand9 = H [card29, card24, card18, card10]
 
 
 ----------------------------------- Tamaño de la mano -------------------------------
-size :: Hand -> Int
-size (H xs)  = length xs 
+sizeHand :: Hand -> Int
+sizeHand (H xs)  = length xs 
 
 ---------------------------------- Genera una mano vacia ---------------------------
 empty :: Hand
@@ -101,20 +101,33 @@ empty = (H [])
 ------------------------ Busca una pinta en una mano ------------------------
 searchSuitHand :: Hand -> Suit -> Bool
 searchSuitHand (H []) s = False
-searchSuitHand (H (Card _ su:xs)) s = if su == s then True else searchSuitHand (H xs) s
+searchSuitHand (H (x:xs)) s = if su == s then True else searchSuitHand (H xs) s
+	where su = getSuit x
 
 ---------------------------------- Carga cartas del mazo hasta encontrar una pinta ------------------------
 loadUpMallet :: Mallet -> Suit -> Mallet
-loadUpMallet [] _ = []
 loadUpMallet (Card v su:xs) s = if s /= su then [Card v su]++loadUpMallet xs s else [Card v su]
 
+------------------------------------ Tamaño del mazo ---------------------------------------------
+sizeMallet :: Mallet -> Int
+sizeMallet m = length m
+
+------------------------------------- Buscar Pinta en el mazo ------------------------------------------
+searchSuitMallet :: Mallet -> Suit -> Bool
+searchSuitMallet [] _ = False
+searchSuitMallet (x:xs) s = if su == s then True else searchSuitMallet xs s
+	where su = getSuit x
+
 ------------------------------------- Carga las cartas que estan en la mesa ------------------------------
-loadUpTable :: Mallet -> Mallet -> Mallet
-loadUpTable m t = if c == [] then t else c
-	where c = loadUpMallet m s
+loadUpTable :: Mallet -> Mallet
+loadUpTable m = m
+
+--------------------------------------- Carga las cartas ---------------------------------------------
+loadUp :: Mallet -> Mallet -> Mallet
+loadUp m t = if (c == False) && (sizeMallet m > 0) then m ++ t else if c == False then t else loadUpMallet m s
+	where c = searchSuitMallet m s
 	      s = getSuit card
 	      card = head t
-
 -------------------------------- Obtiene la pinta de una carta --------------------------------------------
 getSuit :: Card -> Suit
 getSuit (Card _ s) = s
@@ -125,7 +138,7 @@ joinHand x (H cards) = (H (cards ++ x))
 
 ------------------------ Devuelve una mano con cartas de la pinta que esta en la mesa ---------------------
 turnLambda :: Mallet -> Hand -> Mallet -> Hand
-turnLambda m h t = if s == False then joinHand (loadUpTable m t) h else h
+turnLambda m h t = if s == False then joinHand (loadUpTable m ) h else h
 	where s = searchSuitHand h suit
 	      suit = getSuit $ head t
 
@@ -176,7 +189,6 @@ winRound m = max (head m) $ head $ tail m
 
 
 
-
 ------------------------------- Jugador --------------------------------
 
 
@@ -220,6 +232,18 @@ showHand (H (x:[])) = showLetter x
 showHand (H c) = showLetter (head c) ++ ", " ++ showHand (H (tail c))
 
 
+---------------------------------- Seleccionar carta -----------------------------------
+seleccionar_carta :: Hand -> IO ()
+seleccionar_carta h = do
+	print $ showHand h
+	print ("Introduzca el numero de la carta a jugar: (1-" ++ (show $ sizeHand h) ++ ")")
+	c <- getLine
+	print $ showLetter $ last $ take (read c) $ getMallet h
+
+------------------------------------- obtine la lista de cartas de la mano ----------------------------
+getMallet :: Hand -> Mallet
+getMallet (H x) = x
+
 --------------------------------- Main -----------------------------------------
 main = do 
 	gen <- getStdGen
@@ -228,6 +252,7 @@ main = do
 {-	Prueba de las funciones.
 	addLetterToTable (letterToPlay hand1 $ head table) table
 	winRound $ addLetterToTable (letterToPlay hand1 $ head table) table
+	winRound $ addLetterToTable (letterToPlay (turnLambda mallet hand5 table) $ head table) table
 -}
 
 {-mazoaleatorio :: StdGen -> [Int]
