@@ -259,6 +259,8 @@ main = do
 	winRound $ addLetterToTable (letterToPlay (turnLambda mallet hand5 table) $ head table) table
 -}
 
-{-mazoaleatorio :: StdGen -> [Int]
-mazoaleatorio gen = [x|x<-a, not (x `elem` )]
-		where a = randomRs (1,40) gen-}
+mazoaleatorio :: StdGen -> Mallet -> Mallet
+mazoaleatorio gen m = let (r,g) = randomR (0, (sizeMallet m)-1) gen 
+					in (m !! r: if sizeMallet m > 1 then mazoaleatorio g $ delete (m !! r) m else [])
+
+
