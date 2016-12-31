@@ -138,7 +138,7 @@ joinHand x (H cards) = (H (cards ++ x))
 
 ------------------------ Devuelve una mano con cartas de la pinta que esta en la mesa ---------------------
 turnLambda :: Mallet -> Hand -> Mallet -> Hand
-turnLambda m h t = if s == False then joinHand (loadUpTable m ) h else h
+turnLambda m h t = if s == False then joinHand (loadUp m t) h else h
 	where s = searchSuitHand h suit
 	      suit = getSuit $ head t
 
