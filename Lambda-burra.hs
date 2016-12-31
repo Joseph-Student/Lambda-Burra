@@ -248,7 +248,7 @@ seleccionar_carta h = do
 	      w = sizeHand h
 
 
-------------------------------------- obtine la lista de cartas de la mano ----------------------------
+------------------------------------- Obtine la lista de cartas de la mano ----------------------------
 getMallet :: Hand -> Mallet
 getMallet (H x) = x
 
@@ -258,8 +258,16 @@ main :: IO ()
 main = do 
 	gen <- getStdGen
 	putStrLn "Bienvenido al juego carga la burra."
-	putStrLn $ show $ mazoaleatorio gen mallet
-	gen' <- newStdGen
+	let a = asignarHand $ mazoaleatorio gen mallet
+	let mano_lambda = fst a
+	let mano_you = snd a
+	print "Mano de Lambda"
+	putStrLn $ showHand mano_lambda
+	print "Mano You"
+	putStrLn $ showHand mano_you
+	print "Juega You"
+	seleccionar_carta mano_you
+	gen' <- newStdGen 
 	print "Hasta luego"
 
 
@@ -273,4 +281,7 @@ mazoaleatorio :: StdGen -> Mallet -> Mallet
 mazoaleatorio gen m = let (r,g) = randomR (0, (sizeMallet m)-1) gen 
 					in (m !! r: if sizeMallet m > 1 then mazoaleatorio g $ delete (m !! r) m else [])
 
+
+asignarHand :: Mallet -> (Hand,Hand)
+asignarHand m = (H ([x|x<-m,y<-[1,3..13],(head $ x `elemIndices` m) == y]), H ([x|x<-m,y<-[0,2..12],(head $ x `elemIndices` m) == y]))
 
