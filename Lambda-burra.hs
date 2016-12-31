@@ -253,9 +253,15 @@ getMallet :: Hand -> Mallet
 getMallet (H x) = x
 
 --------------------------------- Main -----------------------------------------
+
+main :: IO ()
 main = do 
 	gen <- getStdGen
 	putStrLn "Bienvenido al juego carga la burra."
+	putStrLn $ show $ mazoaleatorio gen mallet
+	gen' <- newStdGen
+	print "Hasta luego"
+
 
 {-	Prueba de las funciones.
 	addLetterToTable (letterToPlay hand1 $ head table) table
