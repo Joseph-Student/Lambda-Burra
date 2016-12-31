@@ -236,9 +236,13 @@ showHand (H c) = showLetter (head c) ++ ", " ++ showHand (H (tail c))
 seleccionar_carta :: Hand -> IO ()
 seleccionar_carta h = do
 	print $ showHand h
-	print ("Introduzca el numero de la carta a jugar: (1-" ++ (show $ sizeHand h) ++ ")")
+	print ("Introduzca el numero de la carta a jugar: (1-" ++ (show w) ++ ")")
 	c <- getLine
-	print $ showLetter $ last $ take (read c) $ getMallet h
+	print $ showLetter $ m !! ((read c) - 1)
+	if w > 1 then seleccionar_carta (H (delete (m !! ((read c) - 1)) m)) else print "Se acabo"
+	where m = getMallet h
+	      w = sizeHand h
+
 
 ------------------------------------- obtine la lista de cartas de la mano ----------------------------
 getMallet :: Hand -> Mallet
