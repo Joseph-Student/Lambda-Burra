@@ -22,10 +22,14 @@ data Player = Lambda | You deriving (Eq, Show);
 type Mallet = [Card] ------------------ Sinonimo -----------------------------------------
 
 mallet :: Mallet
-mallet = [card1,card25,card39,card17,card22,card16,card37,card28,card4,card30,card4,card29,card13,
+mallet = [card1,card2,card3,card4,card5,card6,card7,card8,card9,card10,card11,card12,card13,card14,
+			card15,card16,card17,card18,card19,card20,card21,card22,card23,card24,card25,card26,card27,
+			card28,card29,card30,card31,card32,card33,card34,card35,card36,card37,card38,card39,card40]
+
+{-[card1,card25,card39,card17,card22,card16,card37,card28,card4,card30,card4,card29,card13,
 		card5,card31,card6,card27,card38,card9,card40,card21,card12,card32,card10,card2,card3,
 		card17,card8,card29,card10,card8,card23,card33,card34,card35,card12,card7,card18,card30,
-		card20,card11,card24,card26,card36,card14,card31,card19,card15,card5]
+		card20,card11,card24,card26,card36,card14,card31,card19,card15,card5]-}
 
 table :: Mallet
 table = [card12]
