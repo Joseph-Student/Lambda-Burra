@@ -236,16 +236,26 @@ showHand (H (x:[])) = showLetter x
 showHand (H c) = showLetter (head c) ++ ", " ++ showHand (H (tail c))
 
 
----------------------------------- Seleccionar carta -----------------------------------
-seleccionar_carta :: Hand -> IO ()
-seleccionar_carta h = do
+---------------------------------- Seleccionar una carta -----------------------------------
+selectLetter :: Hand -> IO ()
+selectLetter h = do
 	print $ showHand h
 	print ("Introduzca el numero de la carta a jugar: (1-" ++ (show w) ++ ")")
 	c <- getLine
 	print $ showLetter $ m !! ((read c) - 1)
-	if w > 1 then seleccionar_carta (H (delete (m !! ((read c) - 1)) m)) else print "Se acabo"
+	if w > 1 then selectLetter (H (delete (m !! ((read c) - 1)) m)) else print "Se acabo"
 	where m = getMallet h
 	      w = sizeHand h
+
+
+----------------------------------- Crea un mazo aleatorio ---------------------------------------
+randomMallet :: StdGen -> Mallet -> Mallet
+randomMallet gen m = let (r,g) = randomR (0, (sizeMallet m)-1) gen 
+					in (m !! r: if sizeMallet m > 1 then randomMallet g $ delete (m !! r) m else [])
+
+---------------------------------- Crea las manos de los jugadores -----------------------------------------
+createHands :: Mallet -> (Hand,Hand)
+createHands m = (H ([x|x<-m,y<-[1,3..13],(head $ x `elemIndices` m) == y]), H ([x|x<-m,y<-[0,2..12],(head $ x `elemIndices` m) == y]))
 
 
 ------------------------------------- Obtine la lista de cartas de la mano ----------------------------
@@ -258,7 +268,7 @@ main :: IO ()
 main = do 
 	gen <- getStdGen
 	putStrLn "Bienvenido al juego carga la burra."
-	let a = asignarHand $ mazoaleatorio gen mallet
+	let a = createHands $ randomMallet gen mallet
 	let mano_lambda = fst a
 	let mano_you = snd a
 	print "Mano de Lambda"
@@ -266,7 +276,7 @@ main = do
 	print "Mano You"
 	putStrLn $ showHand mano_you
 	print "Juega You"
-	seleccionar_carta mano_you
+	selectLetter mano_you
 	gen' <- newStdGen 
 	print "Hasta luego"
 
@@ -276,12 +286,4 @@ main = do
 	winRound $ addLetterToTable (letterToPlay hand1 $ head table) table
 	winRound $ addLetterToTable (letterToPlay (turnLambda mallet hand5 table) $ head table) table
 -}
-
-mazoaleatorio :: StdGen -> Mallet -> Mallet
-mazoaleatorio gen m = let (r,g) = randomR (0, (sizeMallet m)-1) gen 
-					in (m !! r: if sizeMallet m > 1 then mazoaleatorio g $ delete (m !! r) m else [])
-
-
-asignarHand :: Mallet -> (Hand,Hand)
-asignarHand m = (H ([x|x<-m,y<-[1,3..13],(head $ x `elemIndices` m) == y]), H ([x|x<-m,y<-[0,2..12],(head $ x `elemIndices` m) == y]))
 
