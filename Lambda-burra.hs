@@ -1,4 +1,4 @@
-import Test.QuickCheck					
+import System.IO.Error					
 import Data.Char							
 import Data.List
 import System.Random
