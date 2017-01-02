@@ -1,19 +1,19 @@
-import System.IO.Error					
-import Data.Char							
+import System.IO.Error
+import Data.Char
 import Data.List
 import System.Random
 
 ------------------------- Creacion de tipos de datos ---------------------------------------
-data Value = Numeric Int | Sota | Caballo | Rey | As 
-						deriving (Eq, Show, Ord);
+data Value = Numeric Int | Sota | Caballo | Rey | As
+                          deriving (Eq, Show, Ord);
 
-data Suit = Oro | Copas | Espadas| Bastos	
-						deriving (Eq, Show, Ord);
+data Suit = Oro | Copas | Espadas| Bastos
+                         deriving (Eq, Show, Ord);
 
-data Card =	Card { 
-					value :: Value,
-					suit :: Suit 
-				 } deriving (Eq, Show , Ord);
+data Card = Card {
+                  value :: Value,
+                  suit :: Suit
+                  } deriving (Eq, Show , Ord);
 
 newtype Hand = H Mallet deriving (Eq, Show);
 
@@ -23,8 +23,8 @@ type Mallet = [Card] ------------------ Sinonimo -------------------------------
 
 mallet :: Mallet
 mallet = [card1,card2,card3,card4,card5,card6,card7,card8,card9,card10,card11,card12,card13,card14,
-			card15,card16,card17,card18,card19,card20,card21,card22,card23,card24,card25,card26,card27,
-			card28,card29,card30,card31,card32,card33,card34,card35,card36,card37,card38,card39,card40]
+          card15,card16,card17,card18,card19,card20,card21,card22,card23,card24,card25,card26,card27,
+          card28,card29,card30,card31,card32,card33,card34,card35,card36,card37,card38,card39,card40]
 
 {-[card1,card25,card39,card17,card22,card16,card37,card28,card4,card30,card4,card29,card13,
 		card5,card31,card6,card27,card38,card9,card40,card21,card12,card32,card10,card2,card3,
@@ -81,7 +81,7 @@ hand1 = H [card14, card28, card3, card4, card38, card17, card8]
 hand2 = H [card26, card5, card32, card16]
 hand3 = H [card40, card5, card30]
 hand4 = H [card3, card31, card15]
-hand5 = H [card3]	
+hand5 = H [card3]
 hand6 = H [card15, card36, card23]
 hand7 = H [card27, card20, card13, card1, card40]
 hand8 = H [card37, card14, card21]
@@ -106,7 +106,7 @@ empty = (H [])
 searchSuitHand :: Hand -> Suit -> Bool
 searchSuitHand (H []) s = False
 searchSuitHand (H (x:xs)) s = if su == s then True else searchSuitHand (H xs) s
-	where su = getSuit x
+    where su = getSuit x
 
 ---------------------------------- Carga cartas del mazo hasta encontrar una pinta ------------------------
 loadUpMallet :: Mallet -> Suit -> Mallet
@@ -120,7 +120,7 @@ sizeMallet m = length m
 searchSuitMallet :: Mallet -> Suit -> Bool
 searchSuitMallet [] _ = False
 searchSuitMallet (x:xs) s = if su == s then True else searchSuitMallet xs s
-	where su = getSuit x
+    where su = getSuit x
 
 ------------------------------------- Carga las cartas que estan en la mesa ------------------------------
 loadUpTable :: Mallet -> Mallet
@@ -129,9 +129,9 @@ loadUpTable m = m
 --------------------------------------- Carga las cartas ---------------------------------------------
 loadUp :: Mallet -> Mallet -> Mallet
 loadUp m t = if (c == False) && (sizeMallet m > 0) then m ++ t else if c == False then t else loadUpMallet m s
-	where c = searchSuitMallet m s
-	      s = getSuit card
-	      card = head t
+    where c = searchSuitMallet m s
+          s = getSuit card
+          card = head t
 -------------------------------- Obtiene la pinta de una carta --------------------------------------------
 getSuit :: Card -> Suit
 getSuit (Card _ s) = s
@@ -143,8 +143,8 @@ joinHand x (H cards) = (H (cards ++ x))
 ------------------------ Devuelve una mano con cartas de la pinta que esta en la mesa ---------------------
 turnLambda :: Mallet -> Hand -> Mallet -> Hand
 turnLambda m h t = if s == False then joinHand (loadUp m t) h else h
-	where s = searchSuitHand h suit
-	      suit = getSuit $ head t
+    where s = searchSuitHand h suit
+          suit = getSuit $ head t
 
 --------------------------- Verifica si una carta es de una pinta -------------------------------------
 checkSuit :: Card -> Suit -> Bool
@@ -203,26 +203,26 @@ searchLetter (H (x:xs)) c = if x == c then x else searchLetter (H xs) c
 
 
 ---------------------------------- Muestra la Pinta de una carta ---------------------------
-showSuit :: Card -> String								
+showSuit :: Card -> String
 showSuit (Card _ s)
-	| s == Oro = "Oro"
-	| s == Copas = "Copas"
-	| s == Espadas = "Espadas"
-	| s == Bastos = "Bastos" 
+    | s == Oro = "Oro"
+    | s == Copas = "Copas"
+    | s == Espadas = "Espadas"
+    | s == Bastos = "Bastos"
 
 --------------------------------- Muestra el valor de una carta --------------------------------
-showValue :: Card -> String									
+showValue :: Card -> String
 showValue (Card v _)
-	| v == As = "1"
-	| v == Sota = "10"
-	| v == Caballo = "11"
-	| v == Rey = "12"
-	| v == (Numeric 2) = show 2
-	| v == (Numeric 3) = show 3
-	| v == (Numeric 4) = show 4
-	| v == (Numeric 5) = show 5
-	| v == (Numeric 6) = show 6
-	| v == (Numeric 7) = show 7
+    | v == As = "1"
+    | v == Sota = "10"
+    | v == Caballo = "11"
+    | v == Rey = "12"
+    | v == (Numeric 2) = show 2
+    | v == (Numeric 3) = show 3
+    | v == (Numeric 4) = show 4
+    | v == (Numeric 5) = show 5
+    | v == (Numeric 6) = show 6
+    | v == (Numeric 7) = show 7
 
 ------------------------------- Muestra una carta ----------------------------------
 showLetter :: Card -> String
@@ -239,19 +239,19 @@ showHand (H c) = showLetter (head c) ++ ", " ++ showHand (H (tail c))
 ---------------------------------- Seleccionar una carta -----------------------------------
 selectLetter :: Hand -> IO ()
 selectLetter h = do
-	print $ showHand h
-	print ("Introduzca el numero de la carta a jugar: (1-" ++ (show w) ++ ")")
-	c <- getLine
-	print $ showLetter $ m !! ((read c) - 1)
-	if w > 1 then selectLetter (H (delete (m !! ((read c) - 1)) m)) else print "Se acabo"
-	where m = getMallet h
-	      w = sizeHand h
+    print $ showHand h
+    print ("Introduzca el numero de la carta a jugar: (1-" ++ (show w) ++ ")")
+    c <- getLine
+    print $ showLetter $ m !! ((read c) - 1)
+    {-if w > 1 then selectLetter (H (delete (m !! ((read c) - 1)) m)) else print "Se acabo"-}
+    where m = getMallet h
+          w = sizeHand h
 
 
 ----------------------------------- Crea un mazo aleatorio ---------------------------------------
 randomMallet :: StdGen -> Mallet -> Mallet
-randomMallet gen m = let (r,g) = randomR (0, (sizeMallet m)-1) gen 
-					in (m !! r: if sizeMallet m > 1 then randomMallet g $ delete (m !! r) m else [])
+randomMallet gen m = let (r,g) = randomR (0, (sizeMallet m)-1) gen
+    in (m !! r: if sizeMallet m > 1 then randomMallet g $ delete (m !! r) m else [])
 
 ---------------------------------- Crea las manos de los jugadores -----------------------------------------
 createHands :: Mallet -> (Hand,Hand)
@@ -265,20 +265,20 @@ getMallet (H x) = x
 --------------------------------- Main -----------------------------------------
 
 main :: IO ()
-main = do 
-	gen <- getStdGen
-	putStrLn "Bienvenido al juego carga la burra."
-	let a = createHands $ randomMallet gen mallet
-	let mano_lambda = fst a
-	let mano_you = snd a
-	print "Mano de Lambda"
-	putStrLn $ showHand mano_lambda
-	print "Mano You"
-	putStrLn $ showHand mano_you
-	print "Juega You"
-	selectLetter mano_you
-	gen' <- newStdGen 
-	print "Hasta luego"
+main = do
+    gen <- getStdGen
+    putStrLn "Bienvenido al juego carga la burra."
+    let a = createHands $ randomMallet gen mallet
+    let mano_lambda = fst a
+    let mano_you = snd a
+    print "Mano de Lambda"
+    putStrLn $ showHand mano_lambda
+    print "Mano You"
+    putStrLn $ showHand mano_you
+    print "Juega You"
+    selectLetter mano_you
+    gen' <- newStdGen
+    print "Hasta luego"
 
 
 {-	Prueba de las funciones.
