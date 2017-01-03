@@ -74,9 +74,9 @@ main = do
     let hand_lambda = fst a
     let hand_you = snd a
     let mallet_play = drop 15 rand_mallet
-    {-print "Mano de Lambda"
+    print "Mano de Lambda"
     putStrLn $ showHand hand_lambda
-    print "Mano You"-}
+    print "Mano You"
     --print $ showHand (H rand_mallet)
     print "Mesa"
     print $ showCard $ head table
@@ -84,10 +84,15 @@ main = do
     putStrLn $ showHand hand_you
     --print "Mazo a Jugar"
     --print $ showHand (H mallet_play)
+    if (searchSuitHand hand_you $ getSuit $ head table) == True then print "jugar" else print $ "Mano con cartas cargadas: " ++(showHand $ joinHand (loadUp mallet_play table) hand_you)
     print ("Introduzca el numero de la carta a jugar: (1-" ++ (show $ sizeHand hand_you) ++ ")")
     c <- getLine
-    let card = selectCard hand_you ((read c) - 1)
-   -- if (checkSuit card $ getSuit $ head table) == True then addCardToTable card table else print "Esa carta de es de la pinta."
+    let card_you = selectCard hand_you ((read c) - 1)
+    if (checkSuit card_you $ getSuit $ head table) == True then do
+        let new_mesa = addCardToTable card_you table
+        print $ "Nueva carta en la mesa: " ++ (showCard $ head new_mesa)
+        print $ "Carta ganadora de la ronda: " ++ (showCard $ winRound $ init $ addCardToTable (cardToPlay hand_lambda $ head new_mesa) new_mesa)
+    else print "Esa carta no es de la pinta de la mesa."
     gen' <- newStdGen
     print "Hasta luego"
 
