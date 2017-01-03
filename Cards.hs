@@ -1,20 +1,5 @@
 module Cards
-( joinHand
-, searchSuitHand
-, getSuit
-, checkSuit
-, checkValue
-, sizeMallet
-, showCard
-, showHand
-, sizeHand
-, selectCard
-, loadUp
-, Card(..)
-, Hand(..)
-, Mallet
-, mallet
-) where
+ where
 
 -------------------------------------------- Creacion de tipos de datos ------------------------------------------------
 data Value = Numeric Int | Sota | Caballo | Rey | As
@@ -40,8 +25,8 @@ mallet = [card1,card2,card3,card4,card5,card6,card7,card8,card9,card10,card11,ca
 		card20,card11,card24,card26,card36,card14,card31,card19,card15,card5]-}
 
 ------------------------------------------------- Creacion de Mesa -----------------------------------------------------
-table :: Mallet
-table = [card12]
+table_test :: Mallet
+table_test = [card12]
 
 ----------------------------------------------- Definicion de Cartas ---------------------------------------------------
 card1 = Card As Oro
@@ -130,7 +115,7 @@ loadUpTable m = m
 
 ------------------------------------------------------- Carga las cartas -----------------------------------------------
 loadUp :: Mallet -> Mallet -> Mallet
-loadUp m t = if (c == False) then m ++ t else loadUpMallet m s
+loadUp m t = if c == False then m ++ t else loadUpMallet m s
     where c = searchSuitMallet m s
           s = getSuit card
           card = head t
@@ -154,6 +139,11 @@ joinHand x (H cards) = (H (cards ++ x))
 searchCard :: Hand -> Card -> Card
 searchCard (H []) _ = (Card (Numeric 0) Oro)
 searchCard (H (x:xs)) c = if x == c then x else searchCard (H xs) c
+
+------------------------------------------- Seleccionar una carta ------------------------------------------------------
+selectCard :: Hand -> Int -> Card
+selectCard h i = m !! i
+    where m = getMallet h
 
 -------------------------------------- Muestra la Pinta de una carta ---------------------------------------------------
 showSuit :: Card -> String
@@ -186,11 +176,6 @@ showHand :: Hand -> String
 showHand (H []) = ""
 showHand (H (x:[])) = showCard x
 showHand (H c) = showCard (head c) ++ ", " ++ showHand (H (tail c))
-
-------------------------------------------- Seleccionar una carta ------------------------------------------------------
-selectCard :: Hand -> Int -> Card
-selectCard h i = m !! i
-    where m = getMallet h
 
 -------------------------------------- Obtine la lista de cartas de la mano --------------------------------------------
 getMallet :: Hand -> Mallet

@@ -60,39 +60,81 @@ createHands m = (H ([x|x<-m,y<-[1,3..13],checkIndex x m y]), H ([x|x<-m,y<-[0,2.
 checkIndex :: Card -> Mallet -> Int -> Bool
 checkIndex c m x = (head $ c `elemIndices` m) == x
 
--------------------------------------- Verifica la carta con la que esta en la mesa ------------------------------------
---checkCard :: Card
+--------------------------------------- Funcion Jugar --------------------------------
+updateHandMallet :: Hand -> Mallet -> Mallet -> (Hand,Mallet)
+updateHandMallet h m t =     
+    if (searchSuitHand h $ getSuit $ head t) == True then
+        (h,m)
+    else do
+        let h' = joinHand (loadUp m t) h
+        let m' = drop (sizeHand h' - sizeHand h) m
+        (h',m')
+
+---------------------------------------------Devuelve la carta que el usuario jugará--------------------------------
+playUser :: Hand -> Int -> Mallet -> Card
+playUser h c t = if v == True then card else (Card (Numeric 0) Oro)
+    where card = selectCard h (c - 1)
+          v = checkSuit card $ getSuit $ head t
+
+----------------------------------------------- Verifica si el usuario carga ---------------------------------------
+{-checkLoadUp :: Hand -> Hand -> Bool
+checkLoadUp h h' = if h == h' then True else False-}
 -------------------------------------------------------- Main ----------------------------------------------------------
 
 main :: IO ()
 main = do
     gen <- getStdGen
     putStrLn "Bienvenido al Juego Carga la Burra."
-    let rand_mallet = randomMallet gen mallet
+    --let rand_mallet = randomMallet gen mallet
+    let rand_mallet = mallet
     let a = createHands rand_mallet
-    let table = addCardToTable (head $ drop 14 rand_mallet) []
-    let hand_lambda = fst a
-    let hand_you = snd a
-    let mallet_play = drop 15 rand_mallet
+    --let table = addCardToTable (head $ drop 14 rand_mallet) []
+    let table = table_test
+    --let hand_lambda = fst a
+    let hand_lambda = hand1
+    --let hand_you = snd a
+    let hand_you = hand5
+    --let mallet_play = drop 15 rand_mallet
+    let mallet_play = rand_mallet
     print "Mano de Lambda"
     putStrLn $ showHand hand_lambda
-    print "Mano You"
+    --print "Mano You"
     --print $ showHand (H rand_mallet)
     print "Mesa"
     print $ showCard $ head table
-    print "Juega You"
+    print "Tu Mano de Cartas:"
     putStrLn $ showHand hand_you
+    --nuevo_you <- hand_you
     --print "Mazo a Jugar"
     --print $ showHand (H mallet_play)
-    if (searchSuitHand hand_you $ getSuit $ head table) == True then print "jugar" else print $ "Mano con cartas cargadas: " ++(showHand $ joinHand (loadUp mallet_play table) hand_you)
-    print ("Introduzca el numero de la carta a jugar: (1-" ++ (show $ sizeHand hand_you) ++ ")")
-    c <- getLine
-    let card_you = selectCard hand_you ((read c) - 1)
-    if (checkSuit card_you $ getSuit $ head table) == True then do
-        let new_mesa = addCardToTable card_you table
-        print $ "Nueva carta en la mesa: " ++ (showCard $ head new_mesa)
-        print $ "Carta ganadora de la ronda: " ++ (showCard $ winRound $ init $ addCardToTable (cardToPlay hand_lambda $ head new_mesa) new_mesa)
-    else print "Esa carta no es de la pinta de la mesa."
+
+    let a = updateHandMallet hand_you mallet_play table
+    if fst a /= hand_you then do
+        print "Tu mano con cartas cargadas:"
+        print $ showHand $ fst a
+    else
+        print ""
+    let hand_you = fst a
+    let mallet_play = snd a
+    if (searchSuitMallet mallet_play $ getSuit $ head table) == False then do
+        print "No hay cartas en el mazo tuvo que cargar de la mesa."
+        print "Su turno ha terminado."
+    else do
+        print ("Introduzca el numero de la carta a jugar: (1-" ++ (show $ sizeHand hand_you) ++ ")")
+        c <- getLine
+        let card = playUser hand_you (read c) table
+        if (card) == (Card (Numeric 0) Oro) then
+            print "Esa carta no es de la pinta que esta en la mesa."
+        else
+            print $ "Carta jugada: "++ showCard card
+
+    
+        --------------------------- Funcion para el usuario ---------------------------------
+    --let new_mesa = addCardToTable card_you table
+    --print $ "Nueva carta en la mesa: " ++ (showCard $ head new_mesa)
+    --print $ "Carta ganadora de la ronda: " ++ (showCard $ winRound $ init $ addCardToTable (cardToPlay (turnLambda mallet_play hand_lambda new_mesa) $ head new_mesa) new_mesa)
+
+    -----------------------------------------------------------------------------------
     gen' <- newStdGen
     print "Hasta luego"
 
