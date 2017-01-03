@@ -60,7 +60,7 @@ createHands m = (H ([x|x<-m,y<-[1,3..13],checkIndex x m y]), H ([x|x<-m,y<-[0,2.
 checkIndex :: Card -> Mallet -> Int -> Bool
 checkIndex c m x = (head $ c `elemIndices` m) == x
 
---------------------------------------- Funcion Jugar --------------------------------
+--------------------------------------- Actualiza el mazo y la mano del jugador--------------------------------
 updateHandMallet :: Hand -> Mallet -> Mallet -> (Hand,Mallet)
 updateHandMallet h m t =     
     if (searchSuitHand h $ getSuit $ head t) == True then
