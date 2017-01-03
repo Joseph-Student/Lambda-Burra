@@ -1,4 +1,20 @@
-module Cards where
+module Cards
+( joinHand
+, searchSuitHand
+, getSuit
+, checkSuit
+, checkValue
+, sizeMallet
+, showCard
+, showHand
+, sizeHand
+, selectCard
+, loadUp
+, Card(..)
+, Hand(..)
+, Mallet
+, mallet
+) where
 
 -------------------------------------------- Creacion de tipos de datos ------------------------------------------------
 data Value = Numeric Int | Sota | Caballo | Rey | As
@@ -138,7 +154,6 @@ joinHand x (H cards) = (H (cards ++ x))
 searchCard :: Hand -> Card -> Card
 searchCard (H []) _ = (Card (Numeric 0) Oro)
 searchCard (H (x:xs)) c = if x == c then x else searchCard (H xs) c
-
 
 -------------------------------------- Muestra la Pinta de una carta ---------------------------------------------------
 showSuit :: Card -> String
