@@ -164,6 +164,7 @@ main = do
     --nuevo_you <- hand_you
     --print "Mazo a Jugar"
     --print $ showHand (H mallet_play)
+    
 
 
         --------------------------- Funcion para el usuario ---------------------------------
