@@ -63,7 +63,7 @@ checkIndex c m x = (head $ c `elemIndices` m) == x
 --------------------------------------- Actualiza el mazo y la mano del jugador--------------------------------
 updateHandMallet :: Hand -> Mallet -> Mallet -> (Hand,Mallet)
 updateHandMallet h m t =     
-    if (searchSuitHand h $ getSuit $ head t) == True then
+    if t == [] || (searchSuitHand h $ getSuit $ head t) == True then
         (h,m)
     else do
         let h' = joinHand (loadUp m t) h
@@ -108,25 +108,55 @@ main = do
     --print "Mazo a Jugar"
     --print $ showHand (H mallet_play)
 
-    let a = updateHandMallet hand_you mallet_play table
-    if fst a /= hand_you then do
-        print "Tu mano con cartas cargadas:"
-        print $ showHand $ fst a
-    else
-        print ""
-    let hand_you = fst a
-    let mallet_play = snd a
-    if (searchSuitMallet mallet_play $ getSuit $ head table) == False then do
-        print "No hay cartas en el mazo tuvo que cargar de la mesa."
-        print "Su turno ha terminado."
-    else do
-        print ("Introduzca el numero de la carta a jugar: (1-" ++ (show $ sizeHand hand_you) ++ ")")
-        c <- getLine
-        let card = playUser hand_you (read c) table
-        if (card) == (Card (Numeric 0) Oro) then
-            print "Esa carta no es de la pinta que esta en la mesa."
+playGame :: Hand -> Hand -> Mallet -> Mallet -> Player -> IO()
+playGame hu hl m t p = do
+
+	if p == Player then do
+        let a = updateHandMallet hu m t
+        
+        if fst a /= hand_you then do
+            print "Tu mano con cartas cargadas:"
+            print $ showHand $ fst a
         else
-            print $ "Carta jugada: "++ showCard card
+            print ""
+
+        let hu = fst a
+        let m = snd a
+   
+        if t == [] then do
+   	        print ("Introduzca el numero de la carta a jugar: (1-" ++ (show $ sizeHand hu) ++ ")")
+            c <- getLine
+            let card_you = playUser hu (read c) t
+            --------se debe verificar que la carta seleccionada este en el rango de cartas disponibles.------------
+            let new_mesa = addCardToTable card_you t
+            print $ "Carta jugada por ti: " ++ (showCard $ head new_mesa)
+            let card_lambda = cardToPlay (turnLambda mallet_play hand_lambda new_mesa) $ head new_mesa
+            print $ "Carta jugada por Lambda: " ++ (showCard $ card_lambda)
+            print $ "Carta ganadora de la ronda: " ++ (showCard $ winRound $ init $ addCardToTable (card_lambda) new_mesa)
+            ---------------se debe verificar el ganador y devolver la llamada del metodo con las manos actualizadas eliminando
+            ---------------las cartas lanzadas por cada jugador y el ganador
+            if card_you > card_lambda then playGame hu hl m [] You else playGame hu hl m [] Lambda                	
+        else 
+            if (searchSuitMallet m $ getSuit $ head t) == False then do
+                print "No hay cartas en el mazo tuvo que cargar la carta de la mesa."
+                print "Su turno ha terminado. *La ronda fue ganada por Lambda*"
+                playGame hu hl m [] Lambda
+            else do
+                print ("Introduzca el numero de la carta a jugar: (1-" ++ (show $ sizeHand hand_you) ++ ")")
+                c <- getLine
+                let card = playUser hand_you (read c) table
+                if (card) == (Card (Numeric 0) Oro) then
+                    print "Esa carta no es de la pinta que esta en la mesa."
+                    ------se debería repetir hasta que ingrese una carta correcta---------------------
+                else
+                    print $ "Carta jugada por ti: "++ showCard card
+                    
+	
+	else do
+
+
+
+    
 
     
         --------------------------- Funcion para el usuario ---------------------------------
