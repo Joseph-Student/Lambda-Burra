@@ -7,18 +7,10 @@ data Player = Lambda | You deriving (Eq, Show);
 
 ------------------------------------------------- Lambda Juega Segundo -------------------------------------------------
 
-
------------------------------------- Devuelve una mano con cartas de la pinta que esta en la mesa ----------------------
-{-turnLambda :: Mallet -> Hand -> Mallet -> (Hand,Mallet)
-turnLambda m h t = if s == False then do
-    let h = joinHand (loadUp m t) h else h
-    where s = searchSuitHand h suit
-          suit = getSuit $ head t-}
-
 --------------------------------------- Actualiza el mazo y la mano del jugador--------------------------------
 updateHandMallet :: Hand -> Mallet -> Mallet -> (Hand,Mallet)
 updateHandMallet h m t =
-    if (t == []) || (searchSuitHand h $ getSuit $ head t) == True then
+    if (searchSuitHand h $ getSuit $ head t) == True then
         (h,m)
     else do
         let h' = joinHand (loadUp m t) h
@@ -236,21 +228,9 @@ main = do
     --print "Mazo a Jugar"
     --print $ showHand (H mallet_play)
     playGame hand_you hand_lambda mallet_play table You
-
-
-        --------------------------- Funcion para el usuario ---------------------------------
-    --let new_mesa = addCardToTable card_you table
-    --print $ "Nueva carta en la mesa: " ++ (showCard $ head new_mesa)
-    --print $ "Carta ganadora de la ronda: " ++ (showCard $ winRound $ init $ addCardToTable (cardToPlay (turnLambda mallet_play hand_lambda new_mesa) $ head new_mesa) new_mesa)
-
-    -----------------------------------------------------------------------------------
     gen' <- newStdGen
-    putStrLn "Hasta luego"
+    putStrLn "Desea Jugar de Nuevo? S(Si) o N(No)."
+    r <- getLine
+    if r == "S" then main else putStrLn "Hasta luego"
 
-
-{-	Prueba de las funciones.
-	addCardToTable (cardToPlay hand1 $ head table) table
-	winRound $ addCardToTable (cardToPlay hand1 $ head table) table
-	winRound $ addCardToTable (cardToPlay (turnLambda mallet hand5 table) $ head table) table
--}
 
