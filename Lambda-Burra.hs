@@ -71,9 +71,27 @@ playUserTwo h c t = if v == True then card else (Card (Numeric 0) Oro)
     where card = selectCard h (c - 1)
           v = checkSuit card $ getSuit $ head t
 
--------------------------------------------  -------------------------------------------------------------------
+------------------------------------------- Devuelve la carta seleccionada por el usuario ------------------------------
 playUserOne :: Hand -> Int -> Card
 playUserOne h c = selectCard h (c - 1)
+
+----------------------------------- Verifica quien gana la ronda -------------------------------------------------
+winPlayerRoundLambda :: Hand -> Hand -> Card -> Card -> Mallet -> IO()
+winPlayerRoundLambda hu hl c cw m =
+    if sizeHand hl > 0 then
+        winPlayer hu hl c cw m
+    else
+        putStrLn "              **Perdiste la Partida, Lambda se ha quedado sin cartas.**"
+
+---------------------------------- Verifica quien gana la ronda -------------------------------------------------------
+winPlayer :: Hand -> Hand -> Card -> Card -> Mallet -> IO()
+winPlayer hu hl c cw m =
+    if c == cw then do
+        putStrLn "              Usted ha ganado la ronda. Juega Primero."
+        playGame hu hl m [] You
+    else do
+        putStrLn "              Lambda ha ganado la ronda. Juega Lambda Primero."
+        playGame hu hl m [] Lambda
 
 ----------------------------------------------Jugar-------------------------------------------------------------
 playGame :: Hand -> Hand -> Mallet -> Mallet -> Player -> IO()
@@ -107,15 +125,7 @@ playGame hu hl m t p = do
                     putStrLn $ "                Carta jugada por Lambda: " ++ (showCard $ card_lambda)
                     let card_win = winRound $ table
                     putStrLn $ "                Carta ganadora de la ronda: " ++ (showCard $ card_win)
-                    if sizeHand new_hand_lambda > 0 then
-                        if card_you == card_win then do
-                            putStrLn "              Usted ha ganado la ronda. Juega Primero."
-                            playGame new_hand_you new_hand_lambda mallet_play [] You
-                        else do
-                            putStrLn "              Lambda ha ganado la ronda. Juega Lambda Primero."
-                            playGame new_hand_you new_hand_lambda mallet_play [] Lambda
-                    else
-                        putStrLn "              **Perdiste la Partida, Lambda se ha quedado sin cartas.**"
+                    winPlayerRoundLambda new_hand_you new_hand_lambda card_you card_win mallet_play
             else
                 putStrLn "                      **Felicitaciones Usted ha Ganado la Partida.**"
         else do
@@ -147,15 +157,7 @@ playGame hu hl m t p = do
                 putStrLn $ "                Carta jugada por Lambda: " ++ (showCard $ card_lambda)
                 let card_win = winRound $ table
                 putStrLn $ "                Carta ganadora de la ronda: " ++ (showCard $ card_win)
-                if sizeHand new_hand_lambda > 0 then
-                    if card_you == card_win then do
-                        putStrLn "                  Usted ha ganado la ronda. Juega Primero."
-                        playGame new_hand_you new_hand_lambda mallet_play [] You
-                    else do
-                        putStrLn "              Lambda ha ganado la ronda. Juega Lambda Primero."
-                        playGame new_hand_you new_hand_lambda mallet_play [] Lambda
-                else
-                    putStrLn "                  **Perdiste la Partida, Lambda se ha quedado sin cartas.**"
+                winPlayerRoundLambda new_hand_you new_hand_lambda card_you card_win mallet_play
     else do
         let card_lambda = greaterCard hl
         let new_hand_lambda = H $ delete card_lambda $ getMallet hl
@@ -201,9 +203,8 @@ playGame hu hl m t p = do
                         putStrLn "                      **Ganaste la Partida, te has quedado sin cartas.**"
         else do
             putStrLn "                      **Perdiste la Partida, Lambda se ha quedado sin cartas.**"
------------------------------------------------ Verifica si el usuario carga ---------------------------------------
-{-checkLoadUp :: Hand -> Hand -> Bool
-checkLoadUp h h' = if h == h' then True else False-}
+
+
 -------------------------------------------------------- Main ----------------------------------------------------------
 
 main :: IO ()
