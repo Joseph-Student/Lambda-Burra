@@ -9,10 +9,21 @@ data Player = Lambda | You deriving (Eq, Show);
 
 
 ------------------------------------ Devuelve una mano con cartas de la pinta que esta en la mesa ----------------------
-turnLambda :: Mallet -> Hand -> Mallet -> Hand
-turnLambda m h t = if s == False then joinHand (loadUp m t) h else h
+{-turnLambda :: Mallet -> Hand -> Mallet -> (Hand,Mallet)
+turnLambda m h t = if s == False then do
+    let h = joinHand (loadUp m t) h else h
     where s = searchSuitHand h suit
-          suit = getSuit $ head t
+          suit = getSuit $ head t-}
+
+--------------------------------------- Actualiza el mazo y la mano del jugador--------------------------------
+updateHandMallet :: Hand -> Mallet -> Mallet -> (Hand,Mallet)
+updateHandMallet h m t =
+    if (searchSuitHand h $ getSuit $ head t) == True then
+        (h,m)
+    else do
+        let h' = joinHand (loadUp m t) h
+        let m' = drop (sizeHand h' - sizeHand h) m
+        (h',m')
 
 ------------------------ Genera una lista con las cartas que matan la carta que esta en la mesa ------------------------
 killcards :: Hand -> Card -> Mallet
@@ -61,42 +72,55 @@ createHands m = (H ([x|x<-m,y<-[1,3..13],checkIndex x m y]), H ([x|x<-m,y<-[0,2.
 checkIndex :: Card -> Mallet -> Int -> Bool
 checkIndex c m x = (head $ c `elemIndices` m) == x
 
---------------------------------------- Actualiza el mazo y la mano del jugador--------------------------------
-updateHandMallet :: Hand -> Mallet -> Mallet -> (Hand,Mallet)
-updateHandMallet h m t =     
-    if (searchSuitHand h $ getSuit $ head t) == True then
-        (h,m)
-    else do
-        let h' = joinHand (loadUp m t) h
-        let m' = drop (sizeHand h' - sizeHand h) m
-        (h',m')
 
----------------------------------------------Devuelve la carta que el usuario jugará--------------------------------
-playUser :: Hand -> Int -> Mallet -> Card
-playUser h c t = if v == True then card else (Card (Numeric 0) Oro)
+------------------------------------------Devuelve la carta que el usuario jugará--------------------------------
+playUserTwo :: Hand -> Int -> Mallet -> Card
+playUserTwo h c t = if v == True then card else (Card (Numeric 0) Oro)
     where card = selectCard h (c - 1)
           v = checkSuit card $ getSuit $ head t
+
+-------------------------------------------  -------------------------------------------------------------------
+playUserOne :: Hand -> Int -> Card
+playUserOne h c = selectCard h (c - 1)
 
 ----------------------------------------------Jugar-------------------------------------------------------------
 playGame :: Hand -> Hand -> Mallet -> Mallet -> Player -> IO()
 playGame hu hl m t p = do
-    if p == You then
-	    if t == [] then do
+    if p == You then do
+        print "Tu Mano de Cartas:"
+        putStrLn $ showHand hu
+        if t == [] then do
 		    print $ "Introduzca el numero de la carta a jugar: (1-" ++ (show $ sizeHand hu) ++ ")"
 		    c <- getLine
-		    let card_you = playUser hu (read c) t
-		    --------se debe verificar que la carta seleccionada este en el rango de cartas disponibles.------------
+		     --------se debe verificar que la carta seleccionada este en el rango de cartas disponibles.------------
+		    let card_you = playUserOne hu (read c)
+		    let new_hand_you = H $ delete card_you $ getMallet hu
 		    let new_mesa = addCardToTable card_you t
-		    print $ "Carta jugada por ti: " ++ (showCard $ head new_mesa)
-		    let card_lambda = cardToPlay (turnLambda m hl new_mesa) $ head new_mesa
-		    print $ "Carta jugada por Lambda: " ++ (showCard $ card_lambda)
-		    print $ "Carta ganadora de la ronda: " ++ (showCard $ winRound $ init $ addCardToTable card_lambda new_mesa)
-		    ---------------se debe verificar el ganador y devolver la llamada del metodo con las manos actualizadas eliminando
-		    ---------------las cartas lanzadas por cada jugador y el ganador
-		    if card_you > card_lambda then
-		    	playGame hu hl m [] You 
-		    else 
-		    	playGame hu hl m [] Lambda
+		    print $ "Carta jugada por ti: " ++ (showCard $ card_you)
+		    if sizeHand new_hand_you > 0 then do
+		        let a = updateHandMallet hl m new_mesa
+		        let hand_lambda = fst a
+		        let mallet_play = snd a
+		        if (searchSuitMallet m $ getSuit $ head t) == False then do
+		            print "Lambda cargó de la mesa."
+		            print "El turno de lambda ha terminado. *La ronda fue ganada por Usted*"
+		            playGame new_hand_you hand_lambda mallet_play [] You
+		        else do
+		            let card_lambda = cardToPlay hand_lambda $ head new_mesa
+		            let new_hand_lambda = H $ delete card_lambda $ getMallet hand_lambda
+		            let table = addCardToTable card_lambda new_mesa
+		            print $ "Carta jugada por Lambda: " ++ (showCard $ card_lambda)
+		            let card_win = winRound $ table
+		            print $ "Carta ganadora de la ronda: " ++ (showCard $ card_win)
+		            if sizeHand new_hand_lambda > 0 then
+		                if card_you == card_win then
+		                    playGame new_hand_you new_hand_lambda mallet_play [] You
+		                else
+		                    playGame hu hl m [] Lambda
+		                else
+		                    print "**Lo Sentimos, ha Perdido la Partida.**"
+		    else
+		        print "**Felicitaciones Usted ha Ganado la Partida.**"
 	    else do
     	    let a = updateHandMallet hu m t
     	    if fst a /= hu then do
@@ -106,26 +130,37 @@ playGame hu hl m t p = do
     	    	print ""
     	    let hu = fst a
     	    let m = snd a
-    	    if (searchSuitMallet m $ getSuit $ head t) == False then do
+    	    {-if (searchSuitMallet m $ getSuit $ head t) == False then do
     	    	print "No hay cartas en el mazo tuvo que cargar la carta de la mesa."
     	    	print "Su turno ha terminado. *La ronda fue ganada por Lambda*"
     	    	playGame hu hl m [] Lambda
-    	    else do
+    	    else do-}
     	    	print ("Introduzca el numero de la carta a jugar: (1-" ++ (show $ sizeHand hu) ++ ")")
     	    	c <- getLine
-    	    	let card = playUser hu (read c) t
-    	    	if card == (Card (Numeric 0) Oro) then
+    	    	let card_you = playUserTwo hu (read c) t
+    	    	let new_mesa = addCardToTable card_you t
+    	    	if card_you == (Card (Numeric 0) Oro) then
     	    		print "Esa carta no es de la pinta que esta en la mesa."
     	    		------se debería repetir hasta que ingrese una carta correcta---------------------
-    	    	else
-    	    		print $ "Carta jugada por ti: "++ showCard card
+    	    	else do
+    	    	    print $ "Carta jugada por ti: "++ showCard card_you
+    	    	    --let card_lambda = cardToPlay (turnLambda m hl new_mesa) $ head new_mesa
+    	    	    let table = addCardToTable card_lambda new_mesa
+    	    	    print $ "Carta jugada por Lambda: " ++ (showCard $ card_lambda)
+    	    	    let card_win = winRound $ init $ table
+    	    	    print $ "Carta ganadora de la ronda: " ++ (showCard card_win)
+    	    	    if card_you == card_win then
+    	    	        playGame hu hl m [] You
+    	    	    else
+    	    	        playGame hu hl m [] Lambda
+
     else do
     	let card_lambda = greaterCard hl
     	let new_mesa = addCardToTable card_lambda t
     	print $ "Carta jugada por Lambda: " ++ (showCard $ card_lambda)
     	print $ "Introduzca el numero de la carta a jugar: (1-" ++ (show $ sizeHand hu) ++ ")"
     	c <- getLine
-    	let card = playUser hu (read c) t
+    	let card = playUserTwo hu (read c) t
     	if card == (Card (Numeric 0) Oro) then
     		print "Esa carta no es de la pinta que esta en la mesa."
     		-----se debería repetir hasta que ingrese una carta correcta---------------------
@@ -159,12 +194,10 @@ main = do
     --print $ showHand (H rand_mallet)
     print "Mesa"
     print $ showCard $ head table
-    print "Tu Mano de Cartas:"
-    putStrLn $ showHand hand_you
     --nuevo_you <- hand_you
     --print "Mazo a Jugar"
     --print $ showHand (H mallet_play)
-    
+    playGame hand_you hand_lambda mallet_play table You
 
 
         --------------------------- Funcion para el usuario ---------------------------------
