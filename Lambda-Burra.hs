@@ -1,5 +1,6 @@
 import Data.List
 import System.Random
+import System.IO.Unsafe
 import Cards
 
 
@@ -93,6 +94,16 @@ winPlayer hu hl c cw m =
         putStrLn "              Lambda ha ganado la ronda. Juega Lambda Primero."
         playGame hu hl m [] Lambda
 
+
+---------------------------------- Pedir carta ------------------------------------------------------
+pedirCarta :: Hand -> IO String
+pedirCarta hu = do
+    putStrLn $ "        Introduzca el numero de la carta a jugar: (1-" ++ (show $ sizeHand hu) ++ ")"
+    c <- getLine
+    if (read c <0) || (read c > sizeHand hu) then
+        pedirCarta hu
+    else
+        return c
 ----------------------------------------------Jugar-------------------------------------------------------------
 playGame :: Hand -> Hand -> Mallet -> Mallet -> Player -> IO()
 playGame hu hl m t p = do
@@ -102,8 +113,7 @@ playGame hu hl m t p = do
         putStrLn $ "    "++showHand hu
         --------se debe repetir hasta verificar que la carta seleccionada este en el rango de cartas disponibles.----
         if t == [] then do
-            putStrLn $ "            Introduzca el numero de la carta a jugar: (1-" ++ (show $ sizeHand hu) ++ ")"
-            c <- getLine
+            let c = unsafePerformIO (pedirCarta hu)
             let card_you = playUserOne hu (read c)
             let new_hand_you = H $ delete card_you $ getMallet hu
             let new_mesa = addCardToTable card_you t
@@ -138,8 +148,7 @@ playGame hu hl m t p = do
                 putStrLn ""
             let hu = fst a
             let m = snd a
-            putStrLn $ "        Introduzca el numero de la carta a jugar: (1-" ++ (show $ sizeHand hu) ++ ")"
-            c <- getLine
+            let c = unsafePerformIO (pedirCarta hu)
             let card_you = playUserTwo hu (read c) t
             if card_you == (Card (Numeric 0) Oro) then
                 putStrLn "              Esa carta no es de la pinta que esta en la mesa."
@@ -173,21 +182,20 @@ playGame hu hl m t p = do
                 putStrLn $ "    "++(showHand $ fst a)
             else
                 putStrLn ""
-            let hu = fst a
+            let hand_you = fst a
             let mallet_play = snd a
-            if (((searchSuitHand hl $ getSuit $ head new_mesa) == False) && ((searchSuitMallet m $ getSuit $ head new_mesa) == False)) then do
+            if (((searchSuitHand hu $ getSuit $ head new_mesa) == False) && ((searchSuitMallet m $ getSuit $ head new_mesa) == False)) then do
                 putStrLn "                  Usted ha cargado de la mesa."
                 putStrLn "                  Su turno ha terminado. *La ronda fue ganada por Lambda*"
-                playGame hu new_hand_lambda mallet_play [] Lambda
+                playGame hand_you new_hand_lambda mallet_play [] Lambda
             else do 
-                putStrLn $ "                    Introduzca el numero de la carta a jugar: (1-" ++ (show $ sizeHand hu) ++ ")"
-                c <- getLine
-                let card_you = playUserTwo hu (read c) new_mesa
+                let c = unsafePerformIO (pedirCarta hu)
+                let card_you = playUserTwo hand_you (read c) new_mesa
                 if card_you == (Card (Numeric 0) Oro) then
                     putStrLn "              Esa carta no es de la pinta que esta en la mesa."
                     ------ todo esto se debería repetir hasta que ingrese una carta correcta---------------------
                 else do
-                    let new_hand_you = H $ delete card_you $ getMallet hu
+                    let new_hand_you = H $ delete card_you $ getMallet hand_you
                     let table = addCardToTable card_you new_mesa
                     putStrLn $ "                Carta jugada por ti: " ++ (showCard $ card_you)
                     let card_win = winRound $ table
