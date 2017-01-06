@@ -97,21 +97,26 @@ winPlayer hu hl c cw m =
 
 ---------------------------------- Pedir carta ------------------------------------------------------
 pedirCarta :: Hand -> IO String
-pedirCarta hu = do
-    putStrLn $ "        Introduzca el numero de la carta a jugar: (1-" ++ (show $ sizeHand hu) ++ ")"
+pedirCarta h = do
+    mostrarMano h
+    putStrLn $ "        Introduzca el numero de la carta a jugar: (1-" ++ (show $ sizeHand h) ++ ")"
     c <- getLine
-    if (read c <0) || (read c > sizeHand hu) then
-        pedirCarta hu
+    if (read c <0) || (read c > sizeHand h) then do
+        putStrLn "          Debe introducir un numero que este en el rango."
+        pedirCarta h
     else
         return c
-----------------------------------------------Jugar-------------------------------------------------------------
+
+----------------------------------------- Mostrar la mano de cartas -------------------------------------------
+mostrarMano :: Hand -> IO ()
+mostrarMano h = do
+    putStrLn ""
+    putStrLn "                          Tu Mano de Cartas:"
+    putStrLn $ "    "++showHand h
+    ----------------------------------------------Jugar-------------------------------------------------------------
 playGame :: Hand -> Hand -> Mallet -> Mallet -> Player -> IO()
 playGame hu hl m t p = do
     if p == You then do
-        putStrLn ""
-        putStrLn "                          Tu Mano de Cartas:"
-        putStrLn $ "    "++showHand hu
-        --------se debe repetir hasta verificar que la carta seleccionada este en el rango de cartas disponibles.----
         if t == [] then do
             let c = unsafePerformIO (pedirCarta hu)
             let card_you = playUserOne hu (read c)
