@@ -120,8 +120,6 @@ playGame hu hl m t p = do
         if null t then do
             let c = unsafePerformIO (pedirCarta hu)
             let card_you = playUserOne hu (read c)
-            --------------------------------- Este es el error ------------------------------------------
-            putStrLn $ "        Carta jugada por ti: " ++ (showCard $ card_you)
             let new_hand_you = H $ delete card_you $ getMallet hu
             let new_mesa = addCardToTable card_you t
             if sizeHand new_hand_you > 0 then do
@@ -138,6 +136,7 @@ playGame hu hl m t p = do
                     let card_lambda = cardToPlay hand_lambda $ head new_mesa
                     let new_hand_lambda = H $ delete card_lambda $ getMallet hand_lambda
                     let table = addCardToTable card_lambda new_mesa
+                    putStrLn $ "                Carta jugada por ti: " ++ (showCard $ card_you)
                     putStrLn $ "                Carta jugada por Lambda: " ++ (showCard $ card_lambda)
                     let card_win = winRound $ table
                     putStrLn $ "                Carta ganadora de la ronda: " ++ (showCard $ card_win)
