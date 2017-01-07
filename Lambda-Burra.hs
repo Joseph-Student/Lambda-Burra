@@ -174,7 +174,7 @@ playGame hu hl m t p = do
                     putStrLn $ "                Carta jugada por ti: " ++ (showCard $ card_you)
                     putStrLn $ "                Carta en la mesa: " ++ (showCard $ card_you)
                     checkHand hand_lambda hl Lambda
-                    putStrLn $ " Lambda tiene en la mano " ++ (showHand $ hand_lambda) ++ " cartas sin jugar."
+                    putStrLn $ "                Lambda tiene en la mano " ++ (show $ sizeHand hand_lambda) ++ " cartas sin jugar."
                     putStrLn $ "                Carta jugada por Lambda: " ++ (showCard $ card_lambda)
                     let card_win = winRound $ table
                     putStrLn $ "                Carta ganadora de la ronda: " ++ (showCard $ card_win)
@@ -202,7 +202,7 @@ playGame hu hl m t p = do
                 let card_lambda = cardToPlay hand_lambda $ head new_mesa
                 let new_hand_lambda = H $ delete card_lambda $ getMallet hand_lambda
                 let table = addCardToTable card_lambda new_mesa
-                putStrLn $ "   Lambda tiene en la mano " ++ (showHand $ hand_lambda) ++ " cartas sin jugar."
+                putStrLn $ "                Lambda tiene en la mano " ++ (show $ sizeHand hand_lambda) ++ " cartas sin jugar."
                 putStrLn $ "                Carta jugada por Lambda: " ++ (showCard $ card_lambda)
                 let card_win = winRound $ table
                 putStrLn $ "                Carta ganadora de la ronda: " ++ (showCard $ card_win)
@@ -212,6 +212,7 @@ playGame hu hl m t p = do
         let new_hand_lambda = H $ delete card_lambda $ getMallet hl
         let new_mesa = addCardToTable card_lambda t
         putStrLn ""
+        putStrLn $ "                Lambda tiene en la mano " ++ (show $ sizeHand hl) ++ " cartas sin jugar."
         putStrLn $ "                Carta jugada por Lambda: " ++ (showCard $ card_lambda)
         putStrLn $ "                Carta en la mesa: " ++ (showCard $ card_lambda)
         if sizeHand new_hand_lambda > 0 then do
