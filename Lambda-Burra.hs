@@ -11,7 +11,7 @@ data Player = Lambda | You deriving (Eq, Show);
 --------------------------------------- Actualiza el mazo y la mano del jugador--------------------------------
 updateHandMallet :: Hand -> Mallet -> Mallet -> (Hand,Mallet)
 updateHandMallet h m t =
-    if (searchSuitHand h $ getSuit $ head t) == True then
+    if (searchSuitHand h $ getSuit $ head t) then
         (h,m)
     else do
         let h' = joinHand (loadUp m t) h
@@ -59,7 +59,7 @@ randomMallet gen m = let (r,g) = randomR (0, (sizeMallet m)-1) gen
 
 -------------------------------------- Crea las manos de los jugadores -------------------------------------------------
 createHands :: Mallet -> (Hand,Hand)
-createHands m = (H ([x|x<-m,y<-[1,3..13],checkIndex x m y]), H ([x|x<-m,y<-[0,2..12],checkIndex x m y]))
+createHands m = (H [x|x<-m,y<-[1,3..13],checkIndex x m y], H [x|x<-m,y<-[0,2..12],checkIndex x m y])
 
 -------------------------------------- Verifica el indice de la carta --------------------------------------------------
 checkIndex :: Card -> Mallet -> Int -> Bool
@@ -68,7 +68,7 @@ checkIndex c m x = (head $ c `elemIndices` m) == x
 
 ------------------------------------------Devuelve la carta que el usuario jugará--------------------------------
 playUserTwo :: Hand -> Int -> Mallet -> Card
-playUserTwo h c t = if v == True then card else (Card (Numeric 0) Oro)
+playUserTwo h c t = if v then card else (Card (Numeric 0) Oro)
     where card = selectCard h (c - 1)
           v = checkSuit card $ getSuit $ head t
 
@@ -101,7 +101,7 @@ pedirCarta h = do
     mostrarMano h
     putStrLn $ "        Introduzca el numero de la carta a jugar: (1-" ++ (show $ sizeHand h) ++ ")"
     c <- getLine
-    if (read c <0) || (read c > sizeHand h) then do
+    if (read c < 1) || (read c > sizeHand h) then do
         putStrLn "          Debe introducir un numero que este en el rango."
         pedirCarta h
     else
@@ -117,19 +117,20 @@ mostrarMano h = do
 playGame :: Hand -> Hand -> Mallet -> Mallet -> Player -> IO()
 playGame hu hl m t p = do
     if p == You then do
-        if t == [] then do
+        if null t then do
             let c = unsafePerformIO (pedirCarta hu)
             let card_you = playUserOne hu (read c)
+            --------------------------------- Este es el error ------------------------------------------
+            putStrLn $ "        Carta jugada por ti: " ++ (showCard $ card_you)
             let new_hand_you = H $ delete card_you $ getMallet hu
             let new_mesa = addCardToTable card_you t
-            putStrLn $ "        Carta jugada por ti: " ++ (showCard $ card_you)
             if sizeHand new_hand_you > 0 then do
                 let a = updateHandMallet hl m new_mesa
                 let hand_lambda = fst a
                 let mallet_play = snd a
                 --putStrLn "Mano de Lambda"
                 --putStrLn $ showHand hand_lambda
-                if (((searchSuitHand hl $ getSuit $ head new_mesa) == False) && ((searchSuitMallet m $ getSuit $ head new_mesa) == False)) then do
+                if (not (searchSuitHand hl $ getSuit $ head new_mesa) && not (searchSuitMallet m $ getSuit $ head new_mesa)) then do
                     putStrLn "                      Lambda carga de la mesa."
                     putStrLn "                   El turno de lambda ha terminado. *La ronda fue ganada por Usted*"
                     playGame new_hand_you hand_lambda mallet_play [] You
@@ -179,22 +180,24 @@ playGame hu hl m t p = do
         putStrLn ""
         putStrLn $ "                Carta jugada por Lambda: " ++ (showCard $ card_lambda)
         if sizeHand new_hand_lambda > 0 then do
-            putStrLn "                      Tu Mano de Cartas:"
-            putStrLn $ "    "++showHand hu
+            --mostrarMano hu
             let a = updateHandMallet hu m new_mesa
             if fst a /= hu then do
-                putStrLn "              No tenías de la pinta de la mesa, tuviste que cargar. Tu nueva mano con las cartas cargadas:"
-                putStrLn $ "    "++(showHand $ fst a)
+                mostrarMano hu
+                putStrLn "              No tienes cartas de la pinta de la mesa, tienes que cargar."
+                putStrLn "Presiona enter para cargar."
+                x <- getLine
+                putStrLn ""
             else
                 putStrLn ""
             let hand_you = fst a
             let mallet_play = snd a
-            if (((searchSuitHand hu $ getSuit $ head new_mesa) == False) && ((searchSuitMallet m $ getSuit $ head new_mesa) == False)) then do
+            if (not (searchSuitHand hu $ getSuit $ head new_mesa) && not (searchSuitMallet m $ getSuit $ head new_mesa)) then do
                 putStrLn "                  Usted ha cargado de la mesa."
                 putStrLn "                  Su turno ha terminado. *La ronda fue ganada por Lambda*"
                 playGame hand_you new_hand_lambda mallet_play [] Lambda
             else do 
-                let c = unsafePerformIO (pedirCarta hu)
+                let c = unsafePerformIO (pedirCarta hand_you)
                 let card_you = playUserTwo hand_you (read c) new_mesa
                 if card_you == (Card (Numeric 0) Oro) then
                     putStrLn "              Esa carta no es de la pinta que esta en la mesa."
@@ -227,29 +230,24 @@ main = do
     putStrLn ""
     putStrLn ""
     let rand_mallet = randomMallet gen mallet
-    --let rand_mallet = mallet
     let a = createHands rand_mallet
     let table = addCardToTable (head $ drop 14 rand_mallet) []
-    --let table = table_test
     let hand_lambda = fst a
-    --let hand_lambda = hand1
     let hand_you = snd a
-    --let hand_you = hand5
     let mallet_play = drop 15 rand_mallet
-    --let mallet_play = rand_mallet
-    --print "Mano de Lambda"
-    --putStrLn $ showHand hand_lambda
-    --print "Mano You"
-    --print $ showHand (H rand_mallet)
+    {- Prueba
+    let rand_mallet = mallet
+    let hand_lambda = hand1
+    let hand_you = hand5
+    let table = table_test
+    let mallet_play = rand_mallet
+    -}
     putStrLn "                                  Mesa"
     putStrLn $ "                                "++(showCard $ head table)
-    --nuevo_you <- hand_you
-    --print "Mazo a Jugar"
-    --print $ showHand (H mallet_play)
     playGame hand_you hand_lambda mallet_play table You
     gen' <- newStdGen
     putStrLn "                          Desea Jugar de Nuevo? S(Si) o N(No)."
     r <- getLine
-    if r == "S" then main else putStrLn "                   Hasta luego"
+    if r == "S" || r == "s" then main else putStrLn "                   Hasta luego"
 
 

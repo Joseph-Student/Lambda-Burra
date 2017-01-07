@@ -109,13 +109,9 @@ searchSuitMallet [] _ = False
 searchSuitMallet (x:xs) s = if su == s then True else searchSuitMallet xs s
     where su = getSuit x
 
------------------------------------------------ Carga las cartas que estan en la mesa ----------------------------------
-loadUpTable :: Mallet -> Mallet
-loadUpTable m = m
-
 ------------------------------------------------------- Carga las cartas -----------------------------------------------
 loadUp :: Mallet -> Mallet -> Mallet
-loadUp m t = if c == False then m ++ t else loadUpMallet m s
+loadUp m t = if not c then m ++ t else loadUpMallet m s
     where c = searchSuitMallet m s
           s = getSuit card
           card = head t
