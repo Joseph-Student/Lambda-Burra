@@ -170,13 +170,8 @@ showCard c = showValue c ++ " " ++ showSuit c
 --------------------------------------------- Muestra una mano ---------------------------------------------------------
 showHand :: Hand -> Int -> String
 showHand (H []) n= ""
-showHand (H (x:[])) n = showCard x ++ "(" ++ (show $ n-1) ++ ")"
-showHand (H c) n = showCard (head c) ++ "(" ++ (show $ n - showNumCardMallet (H c)) ++"), " ++ showHand (H (tail c)) n
+showHand (H c) n = showCard (head c) ++ "(" ++ (show $ n - sizeHand (H c)) ++"), " ++ showHand (H (tail c)) n
 
 -------------------------------------- Obtine la lista de cartas de la mano --------------------------------------------
 getMallet :: Hand -> Mallet
 getMallet (H x) = x
-
-showNumCardMallet :: Hand -> Int
-showNumCardMallet (H (x:[])) = 1
-showNumCardMallet (H c) = 1 + showNumCardMallet (H (tail c))
