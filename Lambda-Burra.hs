@@ -22,9 +22,9 @@ killcards :: Hand -> Card -> Mallet
 killcards (H card) (Card v su) = [x|x<-card, checkSuit x su, checkValue x v]
 
 ---------------------------------- Devuelve la menor carta de una lista ------------------------------------------------
-lowercard :: Mallet -> Card
-lowercard [x] = x
-lowercard (x:y:xs) = if x < y then lowercard (x:xs) else lowercard (y:xs)
+lowerCard :: Mallet -> Card
+lowerCard [x] = x
+lowerCard (x:y:xs) = if x < y then lowerCard (x:xs) else lowerCard (y:xs)
 
 ------------------------------------- Devuelve una lista con las cartas de una pinta -----------------------------------
 cardsSuit :: Hand -> Card -> Mallet
@@ -32,7 +32,7 @@ cardsSuit (H card) (Card v su) = [x|x<-card, checkSuit x su]
 
 ----------------------------------- Devuelve la mejor carta a jugar ----------------------------------------------------
 cardToPlay :: Hand -> Card -> Card
-cardToPlay h c = if  killcards h c /= [] then lowercard $ killcards h c else lowercard $ cardsSuit h c
+cardToPlay h c = if  killcards h c /= [] then lowerCard $ killcards h c else lowerCard $ cardsSuit h c
 
 ---------------------------------------- Lambda Juega Primero ----------------------------------------------------------
 
@@ -41,6 +41,10 @@ greaterCard :: Hand -> Card
 greaterCard (H [x]) = x
 greaterCard (H (x:y:xs)) = if x >= y then greaterCard (H (x:xs)) else greaterCard (H (y:xs))
 
+
+------------------------------------ Devuelve la carta que jugara lambda -----------------------------------------------
+playCardLambda :: Hand -> Mallet -> Card
+playCardLambda h m = if null m then lowerCard $ getMallet h else greaterCard h
 ---------------------------------------- Coloca una carta en la mesa ---------------------------------------------------
 addCardToTable :: Card -> Mallet -> Mallet
 addCardToTable c m = c:m
@@ -210,7 +214,7 @@ playGame hu hl m t p = do
                 putStrLn $ "                Carta ganadora de la ronda: " ++ (showCard $ card_win)
                 winPlayerRound new_hand_you new_hand_lambda card_you card_win mallet_play
     else do
-        let card_lambda = greaterCard hl
+        let card_lambda = playCardLambda hl m
         let new_hand_lambda = H $ delete card_lambda $ getMallet hl
         let new_mesa = addCardToTable card_lambda t
         putStrLn ""
