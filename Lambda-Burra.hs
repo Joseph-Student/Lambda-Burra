@@ -76,15 +76,15 @@ playUserOne :: Hand -> Int -> Card
 playUserOne h c = selectCard h (c - 1)
 
 ----------------------------------- Verifica si algún jugador se quedado sin cartas -------------------------------------------------
-winPlayerRoundLambda :: Hand -> Hand -> Card -> Card -> Mallet -> IO()
-winPlayerRoundLambda hu hl c cw m =
-    if ((sizeHand hl > 0) || (sizeHand hu > 0)) then
+winPlayerRound :: Hand -> Hand -> Card -> Card -> Mallet -> IO()
+winPlayerRound hu hl c cw m =
+    if ((sizeHand hl > 0) && (sizeHand hu > 0)) then
         winPlayer hu hl c cw m
     else
         if sizeHand hl == 0 then
             putStrLn "              **Perdiste la Partida, Lambda se ha quedado sin cartas.**"
         else
-            putStrLn "                    **Ganaste la Partida, te has quedado sin cartas.**"
+            putStrLn "                      **Felicitaciones Usted ha Ganado la Partida.**"
 
 ---------------------------------- Verifica quien gana la ronda -------------------------------------------------------
 winPlayer :: Hand -> Hand -> Card -> Card -> Mallet -> IO()
@@ -180,7 +180,7 @@ playGame hu hl m t p = do
                     putStrLn $ "                Carta jugada por Lambda: " ++ (showCard $ card_lambda)
                     let card_win = winRound $ table
                     putStrLn $ "                Carta ganadora de la ronda: " ++ (showCard $ card_win)
-                    winPlayerRoundLambda new_hand_you new_hand_lambda card_you card_win mallet_play
+                    winPlayerRound new_hand_you new_hand_lambda card_you card_win mallet_play
             else
                 putStrLn "                      **Felicitaciones Usted ha Ganado la Partida.**"
         else do
@@ -208,7 +208,7 @@ playGame hu hl m t p = do
                 putStrLn $ "                Carta jugada por Lambda: " ++ (showCard $ card_lambda)
                 let card_win = winRound $ table
                 putStrLn $ "                Carta ganadora de la ronda: " ++ (showCard $ card_win)
-                winPlayerRoundLambda new_hand_you new_hand_lambda card_you card_win mallet_play
+                winPlayerRound new_hand_you new_hand_lambda card_you card_win mallet_play
     else do
         let card_lambda = greaterCard hl
         let new_hand_lambda = H $ delete card_lambda $ getMallet hl
@@ -239,7 +239,7 @@ playGame hu hl m t p = do
                     putStrLn $ "                Carta jugada por ti: " ++ (showCard $ card_you)
                     let card_win = winRound $ table
                     putStrLn $ "                Carta ganadora de la ronda: " ++ (showCard $ card_win)
-                    winPlayerRoundLambda new_hand_you new_hand_lambda card_you card_win mallet_play
+                    winPlayerRound new_hand_you new_hand_lambda card_you card_win mallet_play
         else do
             putStrLn "                      **Perdiste la Partida, Lambda se ha quedado sin cartas.**"
 
