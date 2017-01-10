@@ -1,4 +1,23 @@
 module Cards
+( Card(..)
+, Hand(..)
+, Mallet
+, Value(..)
+, Suit(..)
+, mallet
+, checkSuit
+, checkValue
+, joinHand
+, loadUp
+, sizeHand
+, getMallet
+, sizeMallet
+, selectCard
+, getSuit
+, searchSuitHand
+, showHand
+, showCard
+, searchSuitMallet)
  where
 
 -------------------------------------------- Creacion de tipos de datos ------------------------------------------------

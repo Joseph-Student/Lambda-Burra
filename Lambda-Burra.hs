@@ -3,7 +3,7 @@ import System.Random
 import System.IO.Unsafe
 import Cards
 
-data Player = Lambda | You deriving (Eq, Show);
+data Player = Lambda | You deriving (Eq);
 
 ------------------------------------------------- Lambda Juega Segundo -------------------------------------------------
 
@@ -79,7 +79,7 @@ playUserTwo h c t = if v then card else (Card (Numeric 0) Oro)
 playUserOne :: Hand -> Int -> Card
 playUserOne h c = selectCard h (c - 1)
 
------------------------------------ Verifica si algún jugador se quedado sin cartas -------------------------------------------------
+----------------------------------- Verifica si algún jugador se ha quedado sin cartas -------------------------------------------------
 winPlayerRound :: Hand -> Hand -> Card -> Card -> Mallet -> IO()
 winPlayerRound hu hl c cw m =
     if ((sizeHand hl > 0) && (sizeHand hu > 0)) then
@@ -159,7 +159,7 @@ playGame hu hl m t p = do
     clearScreen t
     if p == You then do
         if null t then do
-            let c = unsafePerformIO (pedirCarta hu)
+            let c = unsafePerformIO $ pedirCarta hu
             let card_you = playUserOne hu (read c)
             let new_hand_you = H $ delete card_you $ getMallet hu
             let new_mesa = addCardToTable card_you t
@@ -194,7 +194,7 @@ playGame hu hl m t p = do
             checkHand (fst a) hu You
             let hu = fst a
             let m = snd a
-            let c = unsafePerformIO (pedirCarta hu)
+            let c = unsafePerformIO $ pedirCarta hu
             let card_you = playUserTwo hu (read c) t
             if card_you == (Card (Numeric 0) Oro) then
                 putStrLn "              Esa carta no es de la pinta que esta en la mesa."
@@ -235,7 +235,7 @@ playGame hu hl m t p = do
                 nextRound
                 playGame hand_you new_hand_lambda mallet_play [] Lambda
             else do 
-                let c = unsafePerformIO (pedirCarta hand_you)
+                let c = unsafePerformIO $ pedirCarta hand_you
                 let card_you = playUserTwo hand_you (read c) new_mesa
                 if card_you == (Card (Numeric 0) Oro) then
                     putStrLn "              Esa carta no es de la pinta que esta en la mesa."
