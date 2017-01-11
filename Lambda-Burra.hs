@@ -196,9 +196,9 @@ playGame hu hl m t p = do
             let m = snd a
             let c = unsafePerformIO $ pedirCarta hu
             let card_you = playUserTwo hu (read c) t
-            if card_you == (Card (Numeric 0) Oro) then
+            if card_you == (Card (Numeric 0) Oro) then do
                 putStrLn "              Esa carta no es de la pinta que esta en la mesa."
-                ------ todo esto se debería repetir hasta que ingrese una carta correcta---------------------
+                playGame hu hl m t You
             else do
                 let new_hand_you = H $ delete card_you $ getMallet hu
                 let new_mesa = addCardToTable card_you t
@@ -237,9 +237,9 @@ playGame hu hl m t p = do
             else do 
                 let c = unsafePerformIO $ pedirCarta hand_you
                 let card_you = playUserTwo hand_you (read c) new_mesa
-                if card_you == (Card (Numeric 0) Oro) then
+                if card_you == (Card (Numeric 0) Oro) then do
                     putStrLn "              Esa carta no es de la pinta que esta en la mesa."
-                    ------ todo esto se debería repetir hasta que ingrese una carta correcta---------------------
+                    playGame hand_you hl mallet_play new_mesa Lambda
                 else do
                     let new_hand_you = H $ delete card_you $ getMallet hand_you
                     let table = addCardToTable card_you new_mesa
@@ -255,6 +255,7 @@ playGame hu hl m t p = do
 main :: IO ()
 main = do
     gen <- getStdGen
+    gen' <- newStdGen
     putStrLn "                      Bienvenido al Juego Carga la Burra."
     putStrLn ""
     putStrLn ""
@@ -274,7 +275,6 @@ main = do
     putStrLn "                                  Mesa"
     putStrLn $ "                                "++(showCard $ head table)
     playGame hand_you hand_lambda mallet_play table You
-    gen' <- newStdGen
     putStrLn "                          Desea Jugar de Nuevo? S(Si) o N(No)."
     r <- getLine
     if r == "S" || r == "s" then main else putStrLn "                   Hasta luego"
