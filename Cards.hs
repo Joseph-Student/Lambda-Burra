@@ -116,7 +116,7 @@ searchSuitHand (H (x:xs)) s = su == s || searchSuitHand (H xs) s
 
 ------------------------------------- Carga cartas del mazo hasta encontrar una pinta ----------------------------------
 loadUpMallet :: Mallet -> Suit -> Mallet
-loadUpMallet (Card v su:xs) s = if s /= su then Card v su++loadUpMallet xs s else [Card v su]
+loadUpMallet (Card v su:xs) s = if s /= su then Card v su:loadUpMallet xs s else [Card v su]
 
 ----------------------------------------------------- Tamaño del mazo --------------------------------------------------
 sizeMallet :: Mallet -> Int
