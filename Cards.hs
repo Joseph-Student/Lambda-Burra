@@ -44,8 +44,8 @@ mallet = [card1,card2,card3,card4,card5,card6,card7,card8,card9,card10,card11,ca
 		card20,card11,card24,card26,card36,card14,card31,card19,card15,card5]-}
 
 ------------------------------------------------- Creacion de Mesa -----------------------------------------------------
-table_test :: Mallet
-table_test = [card12]
+tableTest :: Mallet
+tableTest = [card12]
 
 ----------------------------------------------- Definicion de Cartas ---------------------------------------------------
 card1 = Card As Oro
@@ -106,26 +106,26 @@ sizeHand (H xs)  = length xs
 
 ------------------------------------------------ Genera una mano vacia -------------------------------------------------
 empty :: Hand
-empty = (H [])
+empty = H []
 
 ---------------------------------------------- Busca una pinta en una mano ---------------------------------------------
 searchSuitHand :: Hand -> Suit -> Bool
 searchSuitHand (H []) s = False
-searchSuitHand (H (x:xs)) s = if su == s then True else searchSuitHand (H xs) s
+searchSuitHand (H (x:xs)) s = su == s || searchSuitHand (H xs) s
     where su = getSuit x
 
 ------------------------------------- Carga cartas del mazo hasta encontrar una pinta ----------------------------------
 loadUpMallet :: Mallet -> Suit -> Mallet
-loadUpMallet (Card v su:xs) s = if s /= su then [Card v su]++loadUpMallet xs s else [Card v su]
+loadUpMallet (Card v su:xs) s = if s /= su then Card v su++loadUpMallet xs s else [Card v su]
 
 ----------------------------------------------------- Tamaño del mazo --------------------------------------------------
 sizeMallet :: Mallet -> Int
-sizeMallet m = length m
+sizeMallet = length
 
 --------------------------------------------------- Buscar Pinta en el mazo --------------------------------------------
 searchSuitMallet :: Mallet -> Suit -> Bool
 searchSuitMallet [] _ = False
-searchSuitMallet (x:xs) s = if su == s then True else searchSuitMallet xs s
+searchSuitMallet (x:xs) s = su == s || searchSuitMallet xs s
     where su = getSuit x
 
 ------------------------------------------------------- Carga las cartas -----------------------------------------------
@@ -140,19 +140,19 @@ getSuit (Card _ s) = s
 
 ------------------------------------------- Verifica si una carta es de una pinta --------------------------------------
 checkSuit :: Card -> Suit -> Bool
-checkSuit c su = if getSuit c == su then True else False
+checkSuit c su = getSuit c == su
 
 ------------------------------------------- Verifica si una carta es mayor que otra ------------------------------------
 checkValue :: Card -> Value -> Bool
-checkValue (Card v _) va = if v > va then True else False
+checkValue (Card v _) va = v > va
 
 -------------------------------------------------- Une las cartas cargadas a la mano -----------------------------------
 joinHand :: Mallet -> Hand -> Hand
-joinHand x (H cards) = (H (cards ++ x))
+joinHand x (H cards) = H (cards ++ x)
 
 --------------------------------------- Busca una carta en la mano -----------------------------------------------------
 searchCard :: Hand -> Card -> Card
-searchCard (H []) _ = (Card (Numeric 0) Oro)
+searchCard (H []) _ = Card (Numeric 0) Oro
 searchCard (H (x:xs)) c = if x == c then x else searchCard (H xs) c
 
 ------------------------------------------- Seleccionar una carta ------------------------------------------------------
@@ -175,12 +175,12 @@ showValue (Card v _)
     | v == Sota = "10"
     | v == Caballo = "11"
     | v == Rey = "12"
-    | v == (Numeric 2) = show 2
-    | v == (Numeric 3) = show 3
-    | v == (Numeric 4) = show 4
-    | v == (Numeric 5) = show 5
-    | v == (Numeric 6) = show 6
-    | v == (Numeric 7) = show 7
+    | v == Numeric 2 = show 2
+    | v == Numeric 3 = show 3
+    | v == Numeric 4 = show 4
+    | v == Numeric 5 = show 5
+    | v == Numeric 6 = show 6
+    | v == Numeric 7 = show 7
 
 --------------------------------------------- Muestra una carta --------------------------------------------------------
 showCard :: Card -> String
@@ -189,7 +189,7 @@ showCard c = showValue c ++ " " ++ showSuit c
 --------------------------------------------- Muestra una mano ---------------------------------------------------------
 showHand :: Hand -> Int -> String
 showHand (H []) n= ""
-showHand (H c) n = showCard (head c) ++ "(" ++ (show $ n - sizeHand (H c)) ++"), " ++ showHand (H (tail c)) n
+showHand (H c) n = showCard (head c) ++ "(" ++ show (n - sizeHand (H c)) ++"), " ++ showHand (H (tail c)) n
 
 -------------------------------------- Obtine la lista de cartas de la mano --------------------------------------------
 getMallet :: Hand -> Mallet
