@@ -2,9 +2,11 @@ module LambdaBurra
 ( playGame
 , checkIndex
 , addCardToTable
+, Player(..)
+, module Data.List
+, module Cards
 ) where
 import Data.List
-import System.Random
 import System.IO.Unsafe
 import Cards
 
