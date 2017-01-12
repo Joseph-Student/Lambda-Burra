@@ -1,0 +1,13 @@
+Name:               Lambda-Burra
+Version:            0.1
+Description:        Juego Tradicional de Carga la Burra
+License:            GPL
+License-file:       LICENSE
+Author:             Joseph Perez, Jesus Salazar
+Maintainer:         24597827@e.ne.udo.edu.ve
+Build-Type:         Simple
+Cabal-Version:      >=1.22
+Executable Lambda-Burra
+    Main-is:        Main.hs
+    Build-Depends:  base >= 4, random
+
