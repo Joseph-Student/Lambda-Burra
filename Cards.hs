@@ -38,12 +38,7 @@ mallet = [card1,card2,card3,card4,card5,card6,card7,card8,card9,card10,card11,ca
           card15,card16,card17,card18,card19,card20,card21,card22,card23,card24,card25,card26,card27,
           card28,card29,card30,card31,card32,card33,card34,card35,card36,card37,card38,card39,card40]
 
-{-[card1,card25,card39,card17,card22,card16,card37,card28,card4,card30,card4,card29,card13,
-		card5,card31,card6,card27,card38,card9,card40,card21,card12,card32,card10,card2,card3,
-		card17,card8,card29,card10,card8,card23,card33,card34,card35,card12,card7,card18,card30,
-		card20,card11,card24,card26,card36,card14,card31,card19,card15,card5]-}
-
-------------------------------------------------- Creacion de Mesa -----------------------------------------------------
+--------------------------------------------- Creacion de Mesa de Prueba -----------------------------------------------
 tableTest :: Mallet
 tableTest = [card12]
 
@@ -89,17 +84,6 @@ card38 = Card Sota Bastos
 card39 = Card Caballo Bastos
 card40 = Card Rey Bastos
 
---------------------------------------------------- Manos de Prueba ----------------------------------------------------
-hand1 = H [card14, card28, card3, card4, card38, card17, card8]
-hand2 = H [card26, card5, card32, card16]
-hand3 = H [card40, card5, card30]
-hand4 = H [card3, card31, card15]
-hand5 = H [card3]
-hand6 = H [card15, card36, card23]
-hand7 = H [card27, card20, card13, card1, card40]
-hand8 = H [card37, card14, card21]
-hand9 = H [card29, card24, card18, card10]
-
 ------------------------------------------------- Tamaño de la mano ----------------------------------------------------
 sizeHand :: Hand -> Int
 sizeHand (H xs)  = length xs
@@ -110,7 +94,7 @@ empty = H []
 
 ---------------------------------------------- Busca una pinta en una mano ---------------------------------------------
 searchSuitHand :: Hand -> Suit -> Bool
-searchSuitHand (H []) s = False
+searchSuitHand (H []) _ = False
 searchSuitHand (H (x:xs)) s = su == s || searchSuitHand (H xs) s
     where su = getSuit x
 
@@ -149,11 +133,6 @@ checkValue (Card v _) va = v > va
 -------------------------------------------------- Une las cartas cargadas a la mano -----------------------------------
 joinHand :: Mallet -> Hand -> Hand
 joinHand x (H cards) = H (cards ++ x)
-
---------------------------------------- Busca una carta en la mano -----------------------------------------------------
-searchCard :: Hand -> Card -> Card
-searchCard (H []) _ = Card (Numeric 0) Oro
-searchCard (H (x:xs)) c = if x == c then x else searchCard (H xs) c
 
 ------------------------------------------- Seleccionar una carta ------------------------------------------------------
 selectCard :: Hand -> Int -> Card
