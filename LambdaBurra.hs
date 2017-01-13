@@ -5,6 +5,7 @@ module LambdaBurra
 , Player(..)
 , module Data.List
 , module Cards
+, nextRound
 ) where
 import Data.List
 import System.IO.Unsafe
@@ -88,18 +89,18 @@ winPlayerRound hu hl c cw m
 winPlayer :: Hand -> Hand -> Card -> Card -> Mallet -> IO()
 winPlayer hu hl c cw m =
     if c == cw then do
-        putStrLn "                GANASTE. Juegas primero en la siguiente ronda."
+        putStrLn "                *GANASTE. JUEGAS PRIMERO EN LA SIGUIENTE RONDA*"
         nextRound
         playGame hu hl m [] You
     else do
-        putStrLn "                LAMBDA HA GANADO. Juegas segundo en la siguiente ronda."
+        putStrLn "                *LAMBDA HA GANADO. JUEGAS SEGUNDO EN LA SIGUIENTE RONDA*"
         nextRound
         playGame hu hl m [] Lambda
 
 ---------------------------------- Continua a la siguiente ronda ---------------------------------------------
 nextRound :: IO()
 nextRound = do
-    putStrLn "              Presiona enter para continuar el juego."
+    putStrLn "                Presiona enter para continuar el juego."
     x <- getLine
     putStrLn ""
 
@@ -107,7 +108,7 @@ nextRound = do
 checkHand :: Hand -> Hand -> Player -> IO()
 checkHand hm h p
     | (hm /= h) && (p == You) = loadCarts h
-    | (hm /= h) && (p == Lambda) = putStrLn "         Lambda no tiene cartas de esa pinta. Ha cargado del mazo"
+    | (hm /= h) && (p == Lambda) = putStrLn "                Lambda no tiene cartas de esa pinta. Ha cargado del mazo"
     | otherwise = putStrLn ""
 
 ---------------------------------- Mensaje para cargar cartas ---------------------------------------
@@ -160,12 +161,12 @@ playGame hu hl m t p = do
                 let a = updateHandMallet hl m new_mesa
                 let hand_lambda = fst a
                 let mallet_play = snd a
-                putStrLn $ "                    Carta jugada por ti: " ++ showCard card_you
+                putStrLn $ "                Carta jugada por ti: " ++ showCard card_you
                 if not (searchSuitHand hl $ getSuit $ head new_mesa) && not (searchSuitMallet m $ getSuit $ head new_mesa)
                   then do
-                    putStrLn "     Lambda debe cargar del mazo pero no hay cartas de esa pinta, se carga la mesa."
+                    putStrLn "     Lambda debe cargar pero no hay cartas de esa pinta, se carga la mesa."
                     putStrLn $ "                Lambda tiene " ++ show (sizeHand hand_lambda) ++ " cartas sin jugar."
-                    putStrLn "            El turno de lambda ha terminado. *La ronda fue ganada por Usted*"
+                    putStrLn "                El turno de lambda ha terminado. *USTED GANA LA RONDA*"
                     nextRound
                     playGame new_hand_you hand_lambda mallet_play [] You
                   else do
@@ -179,8 +180,9 @@ playGame hu hl m t p = do
                     let card_win = winRound table
                     putStrLn $ "                Carta ganadora: " ++ showCard card_win
                     winPlayerRound new_hand_you new_hand_lambda card_you card_win mallet_play
-              else
-                putStrLn "                      **FELICITACIONES, USTED HA GANADO LA PARTIDA.**"
+              else do
+                putStrLn ""
+                putStrLn "                   **FELICITACIONES, USTED HA GANADO LA PARTIDA.**"
           else do
             let a = updateHandMallet hu m t
             checkHand (fst a) hu You
@@ -195,7 +197,7 @@ playGame hu hl m t p = do
               else do
                 let new_hand_you = H $ delete card_you $ getMallet hu
                 let new_mesa = addCardToTable card_you t
-                putStrLn $ "                      Carta jugada por ti: " ++ showCard card_you
+                putStrLn $ "                Carta jugada por ti: " ++ showCard card_you
                 let a = updateHandMallet hl m new_mesa
                 checkHand (fst a) hl Lambda
                 let hand_lambda = fst a
@@ -225,8 +227,8 @@ playGame hu hl m t p = do
             let mallet_play = snd a
             if not (searchSuitHand hu $ getSuit $ head new_mesa) && not (searchSuitMallet m $ getSuit $ head new_mesa)
               then do
-                putStrLn "  Debes cargar del mazo pero no hay cartas de esa pinta, usted carga la mesa."
-                putStrLn "           Su turno ha terminado. *La ronda fue ganada por Lambda*"
+                putStrLn "       Debes cargar pero no hay cartas de esa pinta, usted carga la mesa."
+                putStrLn "           Su turno ha terminado. *LAMBDA HA GANADO LA RONDA*"
                 nextRound
                 playGame hand_you new_hand_lambda mallet_play [] Lambda
               else do
@@ -243,5 +245,6 @@ playGame hu hl m t p = do
                     let card_win = winRound table
                     putStrLn $ "                Carta ganadora: " ++ showCard card_win
                     winPlayerRound new_hand_you new_hand_lambda card_you card_win mallet_play
-          else
+          else do
+            putStrLn ""
             putStrLn "                      **PERDISTE, LAMBDA SE HA QUEDADO SIN CARTAS.**"
