@@ -126,7 +126,7 @@ pedirCarta h = do
     mostrarMano h
     putStrLn $ "        Introduzca el numero de la carta a jugar: (1-" ++ show (sizeHand h) ++ ")"
     c <- getLine
-    if (read c < 1) || (read c > sizeHand h)
+    if null c || ((c >= "A") && (c <= "z")) || (read c < 1) || (read c > sizeHand h)
       then do
         putStrLn "          **ERROR: DEBE INTRODUCIR UN NUMERO QUE ESTE EN EL RANGO.**"
         pedirCarta h

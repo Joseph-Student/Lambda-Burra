@@ -22,8 +22,9 @@ optionGame = do
     putStrLn "2. Leer reglas de Carga Lambda-Burra"
     putStrLn "3. Salir"
     o <- getLine
-    if ((read o /= 1) && (read o /= 2) && (read o /= 3)) then do
+    if null o || ((o >= "A") && (o <= "z")) || (not ((read o > 0) && (read o < 4))) then do
         putStrLn "**ERROR: DEBE INTRODUCIR UNA OPCION VALIDA.**"
+        putStrLn ""
         optionGame
     else
         return o
@@ -65,12 +66,12 @@ main = do
     else do
         if o == "2" then do
             putStrLn ""
-            putStrLn "El primero en jugar siempre es Ud. que debe jugar una carta de la misma pinta de la baraja de la mesa. La mano la gana el jugador"
-                {-que lance la carta con mayor valor y, por consiguiente, debe lanzar una carta sobre la mesa para continuar el juego. Si un jugador
-                en su turno no tiene carta alguna de la «pinta» de la mesa, debe «cargar» del mazo de cartas restantes hasta encontrar la primera
-                ocurrencia de una carta de la misma «pinta» y jugarla; en caso de que se acabe el mazo, y al que le toca el turno no tiene una carta
-                para lanzar, debe entonces recoger todas las cartas lanzadas a la mesa. El jugador que primero se deshaga de todas sus cartas (se
-                quede sin cartas), gana la partida."-}
+            putStrLn "1. El primero en jugar es Ud. debe jugar una carta de la pinta de la mesa."
+            putStrLn "2. La mano la gana el jugador que lance la carta con mayor valor."
+            putStrLn "3. El ganador lanza una carta sobre la mesa en la sig. ronda."
+            putStrLn "4. Si un jugador no tiene carta de la pinta de la mesa, debe cargar del mazo."
+            putStrLn "5. Si se acaba el mazo al cargar, debe entonces cargar recoger la mesa."
+            putStrLn "6. El jugador que primero se deshaga de todas sus cartas, gana la partida."
             r <- getLine
             main
         else
