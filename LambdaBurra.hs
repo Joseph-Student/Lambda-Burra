@@ -136,13 +136,12 @@ pedirCarta h = do
 mostrarMano :: Hand -> IO ()
 mostrarMano h = do
     putStrLn ""
-    putStrLn "                          Tus Cartas:"
+    putStrLn "                               Tus Cartas:"
     putStrLn $ "    "++showHand h (sizeHand h + 1)
 
 ----------------------------------------- Limpiar pantalla para seguir el juego ------------------------------------
 clearScreen :: Mallet -> IO ()
-clearScreen t = if null t then putStrLn "NUEVA RONDA DEL JUEGO" else putStrLn ""
-    --system "cls"
+clearScreen t = if null t then putStrLn "-----------------------------NUEVA RONDA DEL JUEGO------------------------------" else putStrLn ""
 
 --------------------------------------------------Jugar-------------------------------------------------------------
 playGame :: Hand -> Hand -> Mallet -> Mallet -> Player -> IO()
@@ -161,8 +160,6 @@ playGame hu hl m t p = do
                 let a = updateHandMallet hl m new_mesa
                 let hand_lambda = fst a
                 let mallet_play = snd a
-                --putStrLn "Mano de Lambda"
-                --putStrLn $ showHand hand_lambda
                 putStrLn $ "                    Carta jugada por ti: " ++ showCard card_you
                 if not (searchSuitHand hl $ getSuit $ head new_mesa) && not (searchSuitMallet m $ getSuit $ head new_mesa)
                   then do
@@ -248,7 +245,3 @@ playGame hu hl m t p = do
                     winPlayerRound new_hand_you new_hand_lambda card_you card_win mallet_play
           else
             putStrLn "                      **PERDISTE, LAMBDA SE HA QUEDADO SIN CARTAS.**"
-
--------------------------------------------------------- Main ----------------------------------------------------------
-
-

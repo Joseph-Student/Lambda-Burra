@@ -16,7 +16,9 @@ createHands m = (H [x|x<-m,y<-[1,3..13],checkIndex x m y], H [x|x<-m,y<-[0,2..12
 main :: IO ()
 main = do
     gen <- getStdGen
-    putStrLn "                      Bienvenido al Juego Carga la Burra."
+    putStrLn ""
+    putStrLn ""
+    putStrLn "-----------------------BIENVENIDO AL JUEGO CARGA LA BURRA-----------------------"
     putStrLn ""
     putStrLn ""
     let rand_mallet = randomMallet gen mallet
